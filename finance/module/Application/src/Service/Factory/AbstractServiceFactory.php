@@ -12,7 +12,22 @@ use Interop\Container\ContainerInterface;
 
 class AbstractServiceFactory
 {
+    /**
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array|null $options
+     * @return object
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function __invoke(ContainerInterface $container,
+                             $requestedName, array $options = null)
+    {
+        $entityManager = $this->getEntityManager($container);
+        $service = new $requestedName($entityManager);
 
+        return $service;
+    }
     /**
      * @param ContainerInterface $container
      * @return mixed

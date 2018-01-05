@@ -35,11 +35,33 @@ return [
                     ],
                 ],
             ],
+            'import' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/import',
+                    'defaults' => [
+                        'controller' => Controller\ImportController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+            'transaction' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/transaction',
+                    'defaults' => [
+                        'controller' => Controller\TransactionController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ]
         ],
     ],
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
+            Controller\ImportController::class => Controller\Factory\ImportControllerFactory::class,
+            Controller\TransactionController::class => Controller\Factory\TransactionControllerFactory::class,
         ],
     ],
     'view_manager' => [

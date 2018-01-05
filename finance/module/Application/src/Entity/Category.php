@@ -12,10 +12,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="\Application\Repository\CategoryRepository")
  * @ORM\Table(name="category")
  */
-class Category extends AbstractEntityEntity
+class Category extends AbstractEntity
 {
     /**
      * @var integer
@@ -36,15 +36,15 @@ class Category extends AbstractEntityEntity
     /**
      * @var Category[]
      *
-     * @OneToMany(targetEntity="\Application\Entity\Category", mappedBy="parent")
+     * @ORM\OneToMany(targetEntity="\Application\Entity\Category", mappedBy="parent")
      */
     protected $children;
 
     /**
      * @var Category
      *
-     * @ManyToOne(targetEntity="\Application\Entity\Category", inversedBy="children")
-     * @JoinColumn(name="parent_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="\Application\Entity\Category", inversedBy="children")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true)
      */
     protected $parent;
 

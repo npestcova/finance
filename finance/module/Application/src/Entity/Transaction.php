@@ -11,12 +11,11 @@ namespace Application\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
  * @ORM\Table(name="transaction")
  *
- * @ORM\Entity(repositoryClass="Application\Repository\TransactionRepository")
+ * @ORM\Entity(repositoryClass="\Application\Repository\TransactionRepository")
  */
-class Transaction extends AbstractEntityEntity
+class Transaction extends AbstractEntity
 {
     /**
      * @var integer
@@ -28,9 +27,9 @@ class Transaction extends AbstractEntityEntity
     protected $id;
 
     /**
-     * @var \DateTime
+     * @var string
      *
-     * @ORM\Column(name="date", type="date", nullable=true)
+     * @ORM\Column(name="date", type="string", nullable=true)
      */
     protected $date;
 

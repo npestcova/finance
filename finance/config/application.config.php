@@ -65,6 +65,9 @@ return [
     // Initial configuration with which to seed the ServiceManager.
     // Should be compatible with Zend\ServiceManager\Config.
      'service_manager' => [
-
+         'factories' => [
+             \Application\Service\ImportService::class => \Application\Service\Factory\ImportServiceFactory::class,
+             \Application\Service\TransactionService::class => \Application\Service\Factory\AbstractServiceFactory::class,
+         ],
      ],
 ];

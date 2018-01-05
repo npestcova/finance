@@ -1,0 +1,31 @@
+<div class="jumbotron">
+    <button id="reload" type="button" class="btn btn-info" onclick="doTableReload()">Reload</button>
+    <br/>
+    <br/>
+    <table id="example" class="display" width="100%"></table>
+</div>
+
+<script>
+    doTableReload = function() {
+        var dataSet = [
+            [ "2011/04/25", "Tiger Nixon", "System Architect", "Edinburgh", "$320,800" ]
+        ];
+
+        $.ajax();
+
+        $('#example').DataTable( {
+            data: dataSet,
+            columns: [
+                { title: "Date" },
+                { title: "Account" },
+                { title: "Category" },
+                { title: "Description" },
+                { title: "Amount" }
+            ]
+        } );
+    };
+
+    $(document).ready(function() {
+        doTableReload();
+    } );
+</script>

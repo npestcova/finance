@@ -8,7 +8,7 @@
 
 namespace Application\Entity;
 
-abstract class AbstractEntityEntity
+abstract class AbstractEntity
 {
     /**
      * @param object $inputDto
