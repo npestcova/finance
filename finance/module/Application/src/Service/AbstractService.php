@@ -15,7 +15,7 @@ class AbstractService
     /**
      * @var EntityManager
      */
-    private $entityManager;
+    protected $entityManager;
 
     /**
      * ImportService constructor.

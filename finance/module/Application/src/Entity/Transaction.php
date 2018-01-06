@@ -8,6 +8,7 @@
 
 namespace Application\Entity;
 
+use Application\Dto\Transaction\ViewInfoDto;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -62,4 +63,26 @@ class Transaction extends AbstractEntity
      * @ORM\Column(name="amount", type="decimal", precision=6, scale=2, nullable=false)
      */
     protected $amount = 0;
+
+    /**
+     * @return ViewInfoDto
+     */
+    public function getViewInfo()
+    {
+        $viewInfo = new ViewInfoDto();
+
+        $viewInfo->id = $this->id;
+        $viewInfo->description = $this->description;
+        $viewInfo->dateDb = $this->date;
+        $viewInfo->date = \Finance\Date::getViewDate($this->date);
+        $viewInfo->amount = $this->amount;
+        $viewInfo->accountName = $this->account
+            ? $this->account->getName()
+            : Account::DEFAULT_NAME;
+        $viewInfo->categoryName = $this->category
+            ? $this->category->getFullName()
+            : Category::DEFAULT_NAME;
+
+        return $viewInfo;
+    }
 }

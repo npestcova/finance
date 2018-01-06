@@ -16,11 +16,13 @@
         "zendframework/zend-component-installer": "^1.0 || ^0.7 || ^1.0.0-dev@dev",
         "zendframework/zend-mvc": "^3.0.1",
         "zfcampus/zf-development-mode": "^3.0",
-        "doctrine/doctrine-orm-module": "^1.1"
+        "doctrine/doctrine-orm-module": "^1.1",
+        "zendframework/zend-json": "^3.1"
     },
     "autoload": {
         "psr-4": {
-            "Application\\": "module/Application/src/"
+            "Application\\": "module/Application/src/",
+            "Finance\\": "library/Finance/"
         }
     },
     "autoload-dev": {

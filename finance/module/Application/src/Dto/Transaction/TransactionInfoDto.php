@@ -6,7 +6,7 @@
  * Time: 4:58 PM
  */
 
-namespace Application\Dto;
+namespace Application\Dto\Transaction;
 
 
 use Application\Entity\Account;

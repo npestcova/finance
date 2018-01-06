@@ -11,7 +11,7 @@ namespace Application\Service;
 
 use Application\Dto\AccountInfoDto;
 use Application\Dto\CategoryInfoDto;
-use Application\Dto\TransactionInfoDto;
+use Application\Dto\Transaction\TransactionInfoDto;
 use Application\Entity\Account;
 use Application\Entity\Category;
 use Application\Entity\Transaction;

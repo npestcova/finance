@@ -12,6 +12,8 @@ use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
+use Doctrine\DBAL\Driver\PDOMySql\Driver as PDOMySqlDriver;
+
 return [
     'router' => [
         'routes' => [
@@ -46,9 +48,9 @@ return [
                 ],
             ],
             'transaction' => [
-                'type' => Literal::class,
+                'type' => Segment::class,
                 'options' => [
-                    'route'    => '/transaction',
+                    'route'    => '/transaction[/:action]',
                     'defaults' => [
                         'controller' => Controller\TransactionController::class,
                         'action'     => 'index',
@@ -78,6 +80,9 @@ return [
         ],
         'template_path_stack' => [
             __DIR__ . '/../view',
+        ],
+        'strategies' => [
+            'ViewJsonStrategy',
         ],
     ],
     'doctrine' => [

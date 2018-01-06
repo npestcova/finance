@@ -17,6 +17,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Category extends AbstractEntity
 {
+    const DEFAULT_NAME = 'Uncategorized';
+    const NAME_DELIMITER = '. ';
+
     /**
      * @var integer
      *
@@ -55,4 +58,17 @@ class Category extends AbstractEntity
         $this->children = new ArrayCollection();
     }
 
+    /**
+     * @return string
+     */
+    public function getFullName()
+    {
+        $name = '';
+        if ($this->parent) {
+            $name = $this->parent->getFullName() . self::NAME_DELIMITER;
+        }
+        $name .= $this->name;
+
+        return $name;
+    }
 }

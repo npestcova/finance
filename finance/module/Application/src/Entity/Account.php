@@ -16,6 +16,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Account extends AbstractEntity
 {
+    const DEFAULT_NAME = 'Unknown';
+
     /**
      * @var integer
      *
@@ -31,4 +33,12 @@ class Account extends AbstractEntity
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
     protected $name;
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 }

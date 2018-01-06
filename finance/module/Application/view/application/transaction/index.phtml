@@ -6,15 +6,11 @@
 </div>
 
 <script>
-    doTableReload = function() {
-        var dataSet = [
-            [ "2011/04/25", "Tiger Nixon", "System Architect", "Edinburgh", "$320,800" ]
-        ];
-
-        $.ajax();
-
-        $('#example').DataTable( {
-            data: dataSet,
+    FinTransactions = {
+        options: {
+            url: '',
+            table: null,
+            dataTableObj: null,
             columns: [
                 { title: "Date" },
                 { title: "Account" },
@@ -22,10 +18,67 @@
                 { title: "Description" },
                 { title: "Amount" }
             ]
-        } );
+        },
+
+        init: function(params) {
+            this.options.table = params.table;
+            this.options.url = params.url;
+            this.initDataTable();
+            this.reload();
+        },
+
+        initDataTable: function() {
+            this.options.table.DataTable( {
+                data: [],
+                columns: this.options.columns
+            } );
+            this.dataTableObj = this.options.table.dataTable();
+        },
+
+        reload: function() {
+            var self = this;
+
+            self.clear();
+
+            $.ajax({
+                url: self.options.url,
+                method: 'POST',
+                data: {},
+                dataType: 'json'
+            }).done(function(data) {
+                self.setTransactions(data.transactions);
+            })
+            .fail(function() {
+                alert( "error" );
+            });
+        },
+
+        setTransactions: function (transactions) {
+            for (i in transactions) {
+                row = transactions[i];
+                this.dataTableObj.fnAddData([
+                    row.date,
+                    row.accountName,
+                    row.categoryName,
+                    row.description,
+                    row.amount
+                ]);
+            }
+        },
+
+        clear: function() {
+            this.dataTableObj.fnClearTable();
+        }
+    }
+
+    doTableReload = function() {
+        FinTransactions.reload();
     };
 
     $(document).ready(function() {
-        doTableReload();
+        FinTransactions.init({
+            url: '/transaction/load',
+            table: $('#example')
+        })
     } );
 </script>
