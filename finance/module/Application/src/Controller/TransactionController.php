@@ -10,7 +10,10 @@ namespace Application\Controller;
 
 
 use Application\Dto\Transaction\TransactionSearchDto;
+use Application\Service\AccountService;
+use Application\Service\CategoryService;
 use Application\Service\TransactionService;
+use Finance\Date;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -21,22 +24,45 @@ class TransactionController extends AbstractActionController
      * @var TransactionService
      */
     protected $transactionService;
+    /**
+     * @var CategoryService
+     */
+    protected $categoryService;
+    /**
+     * @var AccountService
+     */
+    protected $accountService;
 
-    public function __construct($transactionService)
+    public function __construct($transactionService, $categoryService, $accountService)
     {
         $this->transactionService = $transactionService;
+        $this->categoryService = $categoryService;
+        $this->accountService = $accountService;
     }
 
     public function indexAction()
     {
-        return new ViewModel();
+        $categoriesList = $this->categoryService->getCategoryNames();
+        $accountsList = $this->accountService->getAccountNames();
+        $dateFrom = Date::getViewDateFromTimestamp(strtotime('-1 month'));
+        $dateTo = Date::getViewDateFromTimestamp(time());
+
+        return new ViewModel([
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'categories' => $categoriesList,
+            'accounts' => $accountsList,
+        ]);
     }
 
     public function loadAction()
     {
         $filter = new TransactionSearchDto();
-        $filter->dateFrom = '2017-11-01';
-        $filter->dateTo = '2017-12-02';
+        $filter->dateFrom = Date::getDbDate($this->params()->fromPost('date_from', ''));
+        $filter->dateTo = Date::getDbDate($this->params()->fromPost('date_to', ''));
+        $filter->categoryId = (int) $this->params()->fromPost('category_id', CategoryService::NO_FILTER);
+        $filter->accountId = (int) $this->params()->fromPost('account_id', AccountService::NO_FILTER);
+        $filter->description = trim(strip_tags($this->params()->fromPost('description', '')));
 
         $transactions = $this->transactionService->findTransactions($filter);
 

@@ -69,6 +69,8 @@ return [
          'factories' => [
              \Application\Service\ImportService::class => \Application\Service\Factory\ImportServiceFactory::class,
              \Application\Service\TransactionService::class => \Application\Service\Factory\AbstractServiceFactory::class,
+             \Application\Service\CategoryService::class => \Application\Service\Factory\AbstractServiceFactory::class,
+             \Application\Service\AccountService::class => \Application\Service\Factory\AbstractServiceFactory::class,
          ],
      ],
 ];

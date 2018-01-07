@@ -1,84 +1,59 @@
+<?php $this->headScript()->appendFile($this->basePath('js/view/transaction/FinTransactions.js'));?>
+
 <div class="jumbotron">
-    <button id="reload" type="button" class="btn btn-info" onclick="doTableReload()">Reload</button>
+    <form id="transactions_form">
+        <div class="form-group row">
+            <div class="col-xs-2">
+                <label for="date_from">Date From</label>
+                <input class="form-control datepicker" id="date_from" type="text" value="<?= $this->dateFrom;?>">
+            </div>
+            <div class="col-xs-2">
+                <label for="date_to">Date To</label>
+                <input class="form-control datepicker" id="date_to" type="text" value="<?= $this->dateTo;?>">
+            </div>
+            <div class="col-xs-2">
+                <label for="account_id">Account</label>
+                <select class="form-control" id="account_id">
+                    <?php foreach ($this->accounts as $accountId => $accountName) : ?>
+                        <option value="<?= $accountId; ?>"><?= $accountName;?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-xs-2">
+                <label for="category_id">Category</label>
+                <select class="form-control" id="category_id">
+                    <?php foreach ($this->categories as $categoryId => $categoryName) : ?>
+                        <option value="<?= $categoryId; ?>"><?= $categoryName;?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-xs-4">
+                <label for="description">Description</label>
+                <input class="form-control" id="description" type="text">
+            </div>
+        </div>
+    </form>
+
+    <button id="reload" type="button" class="btn btn-info" onclick="doTableReload()">Filter</button>
     <br/>
     <br/>
-    <table id="example" class="display" width="100%"></table>
+    <table id="transactions" class="display" width="100%"></table>
 </div>
 
 <script>
-    FinTransactions = {
-        options: {
-            url: '',
-            table: null,
-            dataTableObj: null,
-            columns: [
-                { title: "Date" },
-                { title: "Account" },
-                { title: "Category" },
-                { title: "Description" },
-                { title: "Amount" }
-            ]
-        },
-
-        init: function(params) {
-            this.options.table = params.table;
-            this.options.url = params.url;
-            this.initDataTable();
-            this.reload();
-        },
-
-        initDataTable: function() {
-            this.options.table.DataTable( {
-                data: [],
-                columns: this.options.columns
-            } );
-            this.dataTableObj = this.options.table.dataTable();
-        },
-
-        reload: function() {
-            var self = this;
-
-            self.clear();
-
-            $.ajax({
-                url: self.options.url,
-                method: 'POST',
-                data: {},
-                dataType: 'json'
-            }).done(function(data) {
-                self.setTransactions(data.transactions);
-            })
-            .fail(function() {
-                alert( "error" );
-            });
-        },
-
-        setTransactions: function (transactions) {
-            for (i in transactions) {
-                row = transactions[i];
-                this.dataTableObj.fnAddData([
-                    row.date,
-                    row.accountName,
-                    row.categoryName,
-                    row.description,
-                    row.amount
-                ]);
-            }
-        },
-
-        clear: function() {
-            this.dataTableObj.fnClearTable();
-        }
-    }
-
     doTableReload = function() {
         FinTransactions.reload();
     };
 
     $(document).ready(function() {
+        $('.datepicker').datepicker({
+            format: 'mm/dd/yyyy'
+        });
+
         FinTransactions.init({
             url: '/transaction/load',
-            table: $('#example')
+            table: $('#transactions'),
+            form: $('#transactions_form')
         })
     } );
 </script>

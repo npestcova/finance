@@ -16,6 +16,8 @@
             ->prependStylesheet($this->basePath('css/library/bootstrap/bootstrap-theme.min.css'))
             ->prependStylesheet($this->basePath('css/library/bootstrap/bootstrap.min.css'))
             ->prependStylesheet($this->basePath('css/library/datatables/datatables.min.css'))
+            ->appendStylesheet($this->basePath('css/library/bootstrap/bootstrap-datepicker3.min.css'))
+            ->appendStylesheet($this->basePath('css/library/bootstrap/bootstrap-datepicker3.standalone.min'))
         ?>
 
         <!-- Scripts -->
@@ -23,6 +25,8 @@
             ->prependFile($this->basePath('js/library/bootstrap/bootstrap.min.js'))
             ->prependFile($this->basePath('js/library/jquery/jquery-3.1.0.min.js'))
             ->appendFile($this->basePath('js/library/datatables/datatables.min.js'))
+            ->appendFile($this->basePath('js/library/bootstrap/bootstrap-datepicker.min.js'))
+
         ?>
     </head>
     <body>

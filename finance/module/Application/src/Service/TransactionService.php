@@ -14,7 +14,6 @@ use Application\Dto\Transaction\ViewInfoDto;
 use Application\Entity\Transaction;
 use Application\Repository\TransactionRepository;
 use Doctrine\ORM\EntityManager;
-use Finance\Date;
 
 class TransactionService extends AbstractService
 {

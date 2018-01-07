@@ -8,8 +8,9 @@
 
 namespace Application\Controller\Factory;
 
-use Application\Controller\ImportController;
 use Application\Controller\TransactionController;
+use Application\Service\AccountService;
+use Application\Service\CategoryService;
 use Application\Service\TransactionService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
@@ -19,8 +20,14 @@ class TransactionControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $transactionService = $container->get(TransactionService::class);
+        $categoryService = $container->get(CategoryService::class);
+        $accountService = $container->get(AccountService::class);
 
         // Instantiate the controller and inject dependencies
-        return new TransactionController($transactionService);
+        return new TransactionController(
+            $transactionService,
+            $categoryService,
+            $accountService
+        );
     }
 }
