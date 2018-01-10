@@ -56,7 +56,17 @@ return [
                         'action'     => 'index',
                     ],
                 ],
-            ]
+            ],
+            'keywords' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/keyword[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\KeywordController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
         ],
     ],
     'controllers' => [
@@ -64,6 +74,7 @@ return [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\ImportController::class => Controller\Factory\ImportControllerFactory::class,
             Controller\TransactionController::class => Controller\Factory\TransactionControllerFactory::class,
+            Controller\KeywordController::class => Controller\Factory\KeywordControllerFactory::class,
         ],
     ],
     'view_manager' => [

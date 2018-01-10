@@ -22,3 +22,9 @@ CREATE TABLE `transaction` (
   index `account_id` (`account_id`),
   index `category_id` (`category_id`)
 );
+
+CREATE TABLE `keyword` (
+  `id` int(11) PRIMARY KEY AUTO_INCREMENT,
+  `keyword`  varchar(255) not null default '',
+  `category_id` INT (11) null
+);

@@ -1,0 +1,29 @@
+<div class="jumbotron">
+    <form id="transactions_form" method="post" action="/keyword/create">
+        <div class="form-group row">
+            <div class="col-xs-4">
+                <label for="date_from">Keyword</label>
+            </div>
+            <div class="col-xs-4">
+                <label for="category_id">Category</label>
+            </div>
+        </div>
+        <?php for ($i = 0; $i < 10; $i++) : ?>
+            <div class="form-group row">
+                <div class="col-xs-4">
+                    <input class="form-control datepicker" id="new_keyword<?= $i; ?>" type="text" value="" name="new[<?= $i; ?>][keyword]" />
+                </div>
+                <div class="col-xs-4">
+                    <select class="form-control" id="new_category_<?= $i; ?>" name="new[<?= $i; ?>][category]" />
+                    <?php foreach ($this->categories as $categoryId => $categoryName) : ?>
+                        <option value="<?= $categoryId; ?>"><?= $categoryName;?></option>
+                    <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+        <?php endfor; ?>
+    </form>
+
+    <button id="create" type="button" class="btn btn-info" onclick="$('#transactions_form').submit()">Create</button>
+    <br/>
+</div>

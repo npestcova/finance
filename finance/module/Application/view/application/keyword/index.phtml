@@ -1,0 +1,26 @@
+<?php $this->headScript()->appendFile($this->basePath('js/view/keyword/FinKeywords.js'));?>
+
+<div class="jumbotron">
+    <button id="reload" type="button" class="btn btn-info" onclick="doTableReload()">Filter</button>
+    <button id="add" type="button" class="btn btn-info" onclick="gotToUrl('/keyword/new')">Add</button>
+    <br/>
+    <br/>
+    <table id="keywords" class="display" width="100%"></table>
+</div>
+
+<script>
+    doTableReload = function() {
+        FinKeywords.reload();
+    };
+
+    gotToUrl = function(url) {
+        window.location.href = url;
+    };
+
+    $(document).ready(function() {
+        FinKeywords.init({
+            url: '/keyword/load',
+            table: $('#keywords')
+        })
+    } );
+</script>

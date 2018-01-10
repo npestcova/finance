@@ -71,6 +71,7 @@ return [
              \Application\Service\TransactionService::class => \Application\Service\Factory\AbstractServiceFactory::class,
              \Application\Service\CategoryService::class => \Application\Service\Factory\AbstractServiceFactory::class,
              \Application\Service\AccountService::class => \Application\Service\Factory\AbstractServiceFactory::class,
+             \Application\Service\KeywordService::class => \Application\Service\Factory\AbstractServiceFactory::class,
          ],
      ],
 ];
