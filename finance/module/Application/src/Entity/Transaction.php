@@ -74,7 +74,7 @@ class Transaction extends AbstractEntity
         $viewInfo->id = $this->id;
         $viewInfo->description = $this->description;
         $viewInfo->dateDb = $this->date;
-        $viewInfo->date = \Finance\Date::getViewDate($this->date);
+        $viewInfo->date = $this->date; //\Finance\Date::getViewDate($this->date);
         $viewInfo->amount = $this->amount;
         $viewInfo->accountName = $this->account
             ? $this->account->getName()

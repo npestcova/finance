@@ -8,6 +8,7 @@
 
 namespace Application\Repository;
 
+use Application\Dto\Transaction\BulkChangeTransactionsDto;
 use Application\Dto\Transaction\TransactionSearchDto;
 use Application\Entity\Category;
 use Application\Entity\Transaction;
@@ -57,5 +58,21 @@ class TransactionRepository extends AbstractRepository
         }
         $result = $qb->getQuery()->getResult();
         return $result;
+    }
+
+    /**
+     * @param BulkChangeTransactionsDto $inputDto
+     */
+    public function bulkChangeTransactions(BulkChangeTransactionsDto $inputDto)
+    {
+        $qb = $this->createQueryBuilder('t');
+        $qb->update(Transaction::class, 't')
+            ->set('t.category', ':category')
+            ->setParameter('category', $inputDto->categoryId)
+            ->where('t.id IN (:id)')
+            ->setParameter('id', $inputDto->ids);
+
+        $query = $qb->getQuery();
+        $query->execute();
     }
 }

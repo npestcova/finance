@@ -1,7 +1,7 @@
 <?php $this->headScript()->appendFile($this->basePath('js/view/transaction/FinTransactions.js'));?>
 
 <div class="jumbotron">
-    <form id="transactions_form">
+    <form id="filter_form">
         <div class="form-group row">
             <div class="col-xs-2">
                 <label for="date_from">Date From</label>
@@ -37,12 +37,35 @@
     <button id="reload" type="button" class="btn btn-info" onclick="doTableReload()">Filter</button>
     <br/>
     <br/>
-    <table id="transactions" class="display" width="100%"></table>
+	<form id="transaction_form">
+		<div class="form-group row">
+			<div class="col-xs-2">
+				<label for="category_id">Set Category</label>
+				<select class="form-control" id="new_category_id" name="new_category_id">
+					<?php foreach ($this->categories as $categoryId => $categoryName) : ?>
+						<option value="<?= $categoryId; ?>"><?= $categoryName;?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+			<div class="col-xs-2">
+				<label> </label><br/>
+				<button id="apply" type="button" class="btn btn-info" onclick="applyChanges()">Apply</button>
+			</div>
+			
+		</div>
+		<table id="transactions" class="display" width="100%"></table>
+        <div class="col-xs-4">
+            <label for="description">Total: <span id="transaction_total"></span></label>
+        </div>
+	</form>
 </div>
 
 <script>
     doTableReload = function() {
         FinTransactions.reload();
+    };
+    applyChanges = function() {
+        FinTransactions.applyChanges();
     };
 
     $(document).ready(function() {
@@ -52,8 +75,10 @@
 
         FinTransactions.init({
             url: '/transaction/load',
+            saveUrl: '/transaction/save',
             table: $('#transactions'),
-            form: $('#transactions_form')
+            filterForm: $('#filter_form'),
+			form: $('#transaction_form'),
         })
     } );
 </script>

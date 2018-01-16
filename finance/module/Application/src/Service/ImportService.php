@@ -32,6 +32,8 @@ class ImportService extends AbstractService
     const COLUMN_AMOUNT = 'Amount';
     const COLUMN_ACCOUNT = 'Account';
     const COLUMN_CATEGORY = 'Category';
+    const COLUMN_CREDIT = 'Credit';
+    const COLUMN_DEBIT = 'Debit';
 
     /**
      * @var CategoryRepository
@@ -81,13 +83,24 @@ class ImportService extends AbstractService
         $columnDescription = isset($mapping[self::COLUMN_DESCRIPTION]) ? $mapping[self::COLUMN_DESCRIPTION] : null;
         $columnCategoryName = isset($mapping[self::COLUMN_CATEGORY]) ? $mapping[self::COLUMN_CATEGORY] : null;
         $columnAmount = isset($mapping[self::COLUMN_AMOUNT]) ? $mapping[self::COLUMN_AMOUNT] : null;
+        $columnDebit = isset($mapping[self::COLUMN_DEBIT]) ? $mapping[self::COLUMN_DEBIT] : null;
+        $columnCredit = isset($mapping[self::COLUMN_CREDIT]) ? $mapping[self::COLUMN_CREDIT] : null;
 
         fgetcsv($handle, 1000, ",");     // skip the titles
         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
             $transactionInfo = new TransactionInfoDto();
             $transactionInfo->date = Date::getDbDate((string) $data[$columnDate]);
             $transactionInfo->description = (string) $data[$columnDescription];
-            $transactionInfo->amount = (float) $data[$columnAmount];
+
+            if ($columnAmount) {
+                $transactionInfo->amount = (float) $data[$columnAmount];
+            } else {
+                if ((float) $data[$columnDebit] != 0) {
+                    $transactionInfo->amount = 0 - (float) $data[$columnDebit];
+                } elseif ((float) $data[$columnCredit] != 0) {
+                    $transactionInfo->amount = (float) $data[$columnCredit];
+                }
+            }
             $transactionInfo->account = $columnAccountName
                 ? $this->getAccountByName($data[$columnAccountName])
                 : $this->getAccountByName($accountName);
@@ -209,9 +222,22 @@ class ImportService extends AbstractService
             self::COLUMN_DESCRIPTION => 3,
             self::COLUMN_AMOUNT => 4,
         ];
-        $mapping[self::MAPPING_TYPE_BA] = [];
-        $mapping[self::MAPPING_TYPE_BCU] = [];
-        $mapping[self::MAPPING_TYPE_CAPITAL_ONE] = [];
+        $mapping[self::MAPPING_TYPE_BA] = [		
+            self::COLUMN_DATE => 0,
+            self::COLUMN_DESCRIPTION => 2,
+            self::COLUMN_AMOUNT => 4,
+		];
+        $mapping[self::MAPPING_TYPE_BCU] = [
+            self::COLUMN_DATE => 1,
+            self::COLUMN_DESCRIPTION => 6,
+            self::COLUMN_AMOUNT => 4,		
+		];
+        $mapping[self::MAPPING_TYPE_CAPITAL_ONE] = [
+            self::COLUMN_DATE => 2,
+            self::COLUMN_DESCRIPTION => 4,
+            self::COLUMN_DEBIT => 6,
+            self::COLUMN_CREDIT => 7,
+		];
 
         if (isset($mapping[$mappingType])) {
             return $mapping[$mappingType];
@@ -235,6 +261,7 @@ class ImportService extends AbstractService
             'bcu-rainy' => 'BCU-Rainy Day',
             'nick-bcu' => 'Nick BCU Checking',
             'nick-rainy' => 'Nick BCU RainyDay',
+            'bankof' => 'Bank Of America',
         ];
 
         return isset($accountNames[$type])

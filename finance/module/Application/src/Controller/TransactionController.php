@@ -10,6 +10,7 @@ namespace Application\Controller;
 
 
 use Application\Dto\Transaction\TransactionSearchDto;
+use Application\Dto\Transaction\BulkChangeTransactionsDto;
 use Application\Service\AccountService;
 use Application\Service\CategoryService;
 use Application\Service\TransactionService;
@@ -64,10 +65,24 @@ class TransactionController extends AbstractActionController
         $filter->accountId = (int) $this->params()->fromPost('account_id', AccountService::NO_FILTER);
         $filter->description = trim(strip_tags($this->params()->fromPost('description', '')));
 
-        $transactions = $this->transactionService->findTransactions($filter);
+        $result = $this->transactionService->findTransactions($filter);
 
         return new JsonModel([
-            'transactions' => $transactions
+            'transactions' => $result->transactions,
+            'total' => '$' . number_format($result->total, 2),
         ]);
     }
+	
+	public function saveAction()
+	{
+		$inputDto = new BulkChangeTransactionsDto();
+		$inputDto->ids = array_keys(array_filter($this->params()->fromPost('id', [])));
+		$inputDto->categoryId = (int) $this->params()->fromPost('new_category_id', CategoryService::NO_FILTER);
+		
+        $this->transactionService->bulkChangeTransactions($inputDto);
+
+        return $this->forward()->dispatch('Application\Controller\TransactionController', [
+            'action' => 'load',
+        ] + $this->params()->fromPost());
+	}
 }
