@@ -26,8 +26,12 @@ class ImportController extends AbstractActionController
 
     public function indexAction()
     {
-        $directory = 'C:/Home/finance/PowerWallet/';
-        $this->importService->importFilesFromDirectory($directory);
+    }
+
+    public function csvFilesAction()
+    {
+        $directory = 'C:/Home/finance/import/';
+        $this->importService->importCsvFiles($directory);
         die('ok');
     }
 }

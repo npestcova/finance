@@ -1,14 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: npestcova
- * Date: 1/2/2018
- * Time: 2:30 PM
- */
 
 namespace Application\Service\Factory;
 
 use Application\Service\ImportService;
+use Application\Service\KeywordService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -27,7 +22,8 @@ class ImportServiceFactory extends AbstractServiceFactory
                              $requestedName, array $options = null)
     {
         $entityManager = $this->getEntityManager($container);
-        $service = new ImportService($entityManager);
+        $keywordService = $container->get(KeywordService::class);
+        $service = new ImportService($entityManager, $keywordService);
 
         return $service;
     }

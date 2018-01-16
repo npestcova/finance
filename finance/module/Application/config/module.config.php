@@ -38,9 +38,9 @@ return [
                 ],
             ],
             'import' => [
-                'type' => Literal::class,
+                'type' => Segment::class,
                 'options' => [
-                    'route'    => '/import',
+                    'route'    => '/import[/:action]',
                     'defaults' => [
                         'controller' => Controller\ImportController::class,
                         'action'     => 'index',

@@ -55,6 +55,15 @@ class KeywordService extends AbstractService
     }
 
     /**
+     * @return Keyword[]
+     */
+    public function getAllKeywords()
+    {
+        $keywords = $this->keywordRepository->findAll();
+        return $keywords;
+    }
+
+    /**
      * @param $keywords
      * @throws \Doctrine\ORM\OptimisticLockException
      */

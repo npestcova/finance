@@ -83,6 +83,16 @@ class Keyword extends AbstractEntity
     }
 
     /**
+     * @return Category
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+
+
+    /**
      * @param Category $category
      */
     public function setCategory($category)

@@ -17,14 +17,21 @@ use Application\Entity\Category;
 use Application\Entity\Transaction;
 use Application\Repository\AccountRepository;
 use Application\Repository\CategoryRepository;
-use Doctrine\ORM\EntityManager;
+use Finance\Date;
 
 class ImportService extends AbstractService
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    const MAPPING_TYPE_CHASE = 'chase';
+    const MAPPING_TYPE_CHASE_CC = 'chase-cc';
+    const MAPPING_TYPE_BA = 'ba';
+    const MAPPING_TYPE_CAPITAL_ONE = 'cap';
+    const MAPPING_TYPE_BCU = 'bcu';
+
+    const COLUMN_DATE = 'Date';
+    const COLUMN_DESCRIPTION = 'Description';
+    const COLUMN_AMOUNT = 'Amount';
+    const COLUMN_ACCOUNT = 'Account';
+    const COLUMN_CATEGORY = 'Category';
 
     /**
      * @var CategoryRepository
@@ -37,40 +44,28 @@ class ImportService extends AbstractService
     private $accountRepository;
 
     /**
-     * ImportService constructor.
-     * @param $entityManager
+     * @var KeywordService
      */
-    public function __construct($entityManager)
-    {
-        $this->entityManager = $entityManager;
-        $this->categoryRepository = $this->entityManager->getRepository(Category::class);
-        $this->accountRepository = $this->entityManager->getRepository(Account::class);
-    }
+    private $keywordService;
 
     /**
-     * @param $dirName
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * ImportService constructor.
+     * @param $entityManager
+     * @param KeywordService $keywordService
      */
-    public function importFilesFromDirectory($dirName)
+    public function __construct($entityManager, $keywordService)
     {
-        $files = scandir($dirName);
-
-        foreach ($files as $fileName) {
-            $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
-            if ($fileExtension != 'csv') {
-                continue;
-            }
-
-            $this->importFile($dirName . $fileName);
-            echo $fileName . ' done <br/>';
-        }
+        parent::__construct($entityManager);
+        $this->categoryRepository = $this->entityManager->getRepository(Category::class);
+        $this->accountRepository = $this->entityManager->getRepository(Account::class);
+        $this->keywordService = $keywordService;
     }
 
     /**
      * @param $fileName
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function importFile($fileName)
+    public function importFile($fileName, $mapping, $accountName)
     {
         $handle = fopen($fileName, "r");
 
@@ -81,27 +76,54 @@ class ImportService extends AbstractService
 
         $row = 1;
 
-        $columnDate = 0;
-        $columnAccountName = 1;
-        $columnDescription = 2;
-        $columnCategoryName = 3;
-        $columnAmount = 4;
+        $columnDate = isset($mapping[self::COLUMN_DATE]) ? $mapping[self::COLUMN_DATE] : null;
+        $columnAccountName = isset($mapping[self::COLUMN_ACCOUNT]) ? $mapping[self::COLUMN_ACCOUNT] : null;
+        $columnDescription = isset($mapping[self::COLUMN_DESCRIPTION]) ? $mapping[self::COLUMN_DESCRIPTION] : null;
+        $columnCategoryName = isset($mapping[self::COLUMN_CATEGORY]) ? $mapping[self::COLUMN_CATEGORY] : null;
+        $columnAmount = isset($mapping[self::COLUMN_AMOUNT]) ? $mapping[self::COLUMN_AMOUNT] : null;
 
         fgetcsv($handle, 1000, ",");     // skip the titles
         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
             $transactionInfo = new TransactionInfoDto();
-            $transactionInfo->date = (string) $data[$columnDate];
+            $transactionInfo->date = Date::getDbDate((string) $data[$columnDate]);
             $transactionInfo->description = (string) $data[$columnDescription];
             $transactionInfo->amount = (float) $data[$columnAmount];
-            $transactionInfo->account = $this->getAccountByName($data[$columnAccountName]);
-            $transactionInfo->category = $this->getCategoryByName($data[$columnCategoryName]);
+            $transactionInfo->account = $columnAccountName
+                ? $this->getAccountByName($data[$columnAccountName])
+                : $this->getAccountByName($accountName);
+            $transactionInfo->category = $columnCategoryName
+                ? $this->getCategoryByName($data[$columnCategoryName])
+                : $this->getCategoryByDescription($transactionInfo->description);
 
             $transaction = new Transaction($transactionInfo);
 
             $this->entityManager->persist($transaction);
-            $this->entityManager->flush();
         }
+        $this->entityManager->flush();
         fclose($handle);
+    }
+
+    public function importCsvFiles($dirName)
+    {
+        $files = scandir($dirName);
+
+        foreach ($files as $fileName) {
+            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            if ($fileExtension != 'csv') {
+                continue;
+            }
+
+            list($mappingType, $accountType, $tmp) = explode('_', $fileName);
+            $mapping = $this->getCsvMapping($mappingType);
+            if (!$mapping) {
+                echo 'file ' . $fileName . ' mapping not found';
+                continue;
+            }
+            $accountName = $this->getAccountNameByType($accountType);
+
+            $this->importFile($dirName . $fileName, $mapping, $accountName);
+            echo $fileName . ' done <br/>';
+        }
     }
 
     /**
@@ -149,5 +171,74 @@ class ImportService extends AbstractService
         }
 
         return $category;
+    }
+
+    /**
+     * @param string $description
+     * @return Category|null
+     */
+    protected function getCategoryByDescription($description)
+    {
+        if (empty($description)) {
+            return null;
+        }
+
+        $keywords = $this->keywordService->getAllKeywords();
+        foreach ($keywords as $keyword) {
+            if ($keyword->matches($description)) {
+                return $keyword->getCategory();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $mappingType
+     * @return null
+     */
+    public function getCsvMapping($mappingType)
+    {
+        $mapping[self::MAPPING_TYPE_CHASE] = [
+            self::COLUMN_DATE => 1,
+            self::COLUMN_DESCRIPTION => 2,
+            self::COLUMN_AMOUNT => 3,
+        ];
+        $mapping[self::MAPPING_TYPE_CHASE_CC] = [
+            self::COLUMN_DATE => 2,
+            self::COLUMN_DESCRIPTION => 3,
+            self::COLUMN_AMOUNT => 4,
+        ];
+        $mapping[self::MAPPING_TYPE_BA] = [];
+        $mapping[self::MAPPING_TYPE_BCU] = [];
+        $mapping[self::MAPPING_TYPE_CAPITAL_ONE] = [];
+
+        if (isset($mapping[$mappingType])) {
+            return $mapping[$mappingType];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $type
+     * @return mixed|string
+     */
+    public function getAccountNameByType($type)
+    {
+        $accountNames = [
+            'checking' => 'Checking Account',
+            'saving' => 'Saving',
+            'cap' => 'Capital One',
+            'amazon' => 'Amazon',
+            'bcu' => 'BCU-checking',
+            'bcu-rainy' => 'BCU-Rainy Day',
+            'nick-bcu' => 'Nick BCU Checking',
+            'nick-rainy' => 'Nick BCU RainyDay',
+        ];
+
+        return isset($accountNames[$type])
+            ? $accountNames[$type]
+            : '';
     }
 }
