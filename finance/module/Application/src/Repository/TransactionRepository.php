@@ -9,6 +9,7 @@
 namespace Application\Repository;
 
 use Application\Dto\Transaction\BulkChangeTransactionsDto;
+use Application\Dto\Transaction\GetTotalsByCategoryInputDto;
 use Application\Dto\Transaction\TransactionSearchDto;
 use Application\Entity\Category;
 use Application\Entity\Transaction;
@@ -45,8 +46,8 @@ class TransactionRepository extends AbstractRepository
         if ($filter->categoryId != CategoryService::NO_FILTER &&
             $filter->categoryId != 0
         ) {
-            //@TODO: show children's if parent selected
-            $qb->andWhere('t.category = :categoryId')
+            $qb->leftJoin('t.category', 'c')
+                ->andWhere('c.id = :categoryId OR c.parent = :categoryId')
                 ->setParameter('categoryId', $filter->categoryId);
         } elseif ($filter->categoryId == 0) {
             $qb->andWhere('t.category is null');
@@ -74,5 +75,35 @@ class TransactionRepository extends AbstractRepository
 
         $query = $qb->getQuery();
         $query->execute();
+    }
+
+    /**
+     * @param GetTotalsByCategoryInputDto $inputDto
+     * @return array
+     */
+    public function findTotalsByCategory(GetTotalsByCategoryInputDto $inputDto)
+    {
+        $queryBuilder = $this->createQueryBuilder('t')
+            ->select('SUM(t.amount) as total')
+            ->addSelect('IDENTITY(t.category) as category_id')
+            ->groupBy('t.category');
+
+        if (!empty($inputDto->categoryIds)) {
+            $queryBuilder->andWhere('t.category in (:categories)')
+                ->setParameter('categories', $inputDto->categoryIds);
+        }
+
+        if (!empty($inputDto->startDate)) {
+            $queryBuilder->andWhere('t.date >= :startDate')
+                ->setParameter('startDate', $inputDto->startDate);
+        }
+
+        if (!empty($inputDto->endDate)) {
+            $queryBuilder->andWhere('t.date <= :endDate')
+                ->setParameter('endDate', $inputDto->endDate);
+        }
+
+        $result = $queryBuilder->getQuery()->getResult();
+        return $result;
     }
 }

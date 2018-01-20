@@ -85,4 +85,13 @@ class TransactionController extends AbstractActionController
             'action' => 'load',
         ] + $this->params()->fromPost());
 	}
+
+	public function pocketAction()
+    {
+        $rows = $this->transactionService->getPocketMoneyBalance();
+
+        return new JsonModel([
+            'rows' => $rows,
+        ]);
+    }
 }

@@ -87,4 +87,24 @@ class Category extends AbstractEntity
     {
         return $this->id;
     }
+
+    public function getSubcategoryNames($prefix = '')
+    {
+        $result = [];
+        foreach ($this->children as $subCategory) {
+            $result[$subCategory->getId()] = $prefix . $subCategory->getName();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return Category
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+
 }

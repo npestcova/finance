@@ -38,7 +38,7 @@ class CategoryService extends AbstractService
      */
     public function getCategoryNames()
     {
-        $categories = $this->categoryRepository->findBy([], ['name' => 'ASC']);
+        $categories = $this->categoryRepository->findBy(['parent' => null], ['name' => 'ASC']);
 
         $result = [
             self::NO_FILTER => '-- ALL --',
@@ -50,6 +50,10 @@ class CategoryService extends AbstractService
         /** @var Category $category */
         foreach ($categories as $category) {
             $result[$category->getId()] = $category->getName();
+            $subCategories = $category->getSubcategoryNames('-- ');
+            if (!empty($subCategories)) {
+                $result = $result + $subCategories;
+            }
         }
 
         return $result;

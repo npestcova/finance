@@ -31,3 +31,9 @@ div.container a.navbar-brand > img {
     margin-right: 4px;
     margin-top: -2px;
 }
+.bg-primary {
+    background-color: #5283b8 !important;
+}
+.bg-secondary {
+    background-color: #67c249 !important;
+}

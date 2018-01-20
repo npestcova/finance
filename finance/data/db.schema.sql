@@ -2,6 +2,7 @@ CREATE TABLE `category` (
   `id` int(11) PRIMARY KEY AUTO_INCREMENT,
   `name` varchar (255) not null default '',
   `parent_id` int(11) null,
+  `exclude_from_cashflow` TINYINT(1) NOT NULL DEFAULT 0
   INDEX `parent_id` (`parent_id`)
 );
 
