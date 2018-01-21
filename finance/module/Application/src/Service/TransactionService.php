@@ -139,6 +139,10 @@ class TransactionService extends AbstractService
                 }
             }
 
+            if ($inputDto->excludeCashFlow && $parent->needExcludeFromCashFlow()) {
+                continue;
+            }
+
             if (!isset($parentCategories[$mainCategoryId])) {
                 $parentTotal = new CategoryTotalDto();
                 $parentTotal->categoryId = $mainCategoryId;
@@ -160,7 +164,7 @@ class TransactionService extends AbstractService
             if (!isset($parentCategories[$mainCategoryId]->subCategories[$subCategoryId])) {
                 $subCategoryTotal = new CategoryTotalDto();
                 $subCategoryTotal->categoryId = $mainCategoryId;
-                $subCategoryTotal->categoryName = $parent->getName();
+                $subCategoryTotal->categoryName = $subCategory->getName();
                 $subCategoryTotal->startDate = $inputDto->startDate;
                 $subCategoryTotal->endDate = $inputDto->endDate;
                 $subCategoryTotal->amount = 0;
@@ -170,7 +174,24 @@ class TransactionService extends AbstractService
             $parentCategories[$mainCategoryId]->subCategories[$subCategoryId]->amount += $amount;
         }
 
-        return $parentCategories;
+        if ($inputDto->showHierarchy) {
+            $result = [];
+            /** @var CategoryTotalDto $parent */
+            foreach ($parentCategories as $parent) {
+                $children = $parent->subCategories;
+                $parent->subCategories = [];
+                $result[] = $parent;
+                /** @var CategoryTotalDto $child */
+                foreach ($children as $child) {
+                    $child->categoryName = '-- ' . $child->categoryName;
+                    $result[] = $child;
+                }
+            }
+        } else {
+            $result = $parentCategories;
+        }
+
+        return $result;
     }
 
     public function getPocketMoneyBalance()
@@ -197,6 +218,7 @@ class TransactionService extends AbstractService
             }
             $row->categoryName = $categoryNames[$row->categoryId];
         }
-        return array_values($rows);]
+        return array_values($rows);
     }
+
 }

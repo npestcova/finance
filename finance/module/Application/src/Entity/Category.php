@@ -36,6 +36,14 @@ class Category extends AbstractEntity
      */
     protected $name;
 
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="exclude_from_cashflow", type="integer", length=1, nullable=false)
+     */
+    protected $excludeFromCashflow;
+
     /**
      * @var Category[]
      *
@@ -106,5 +114,11 @@ class Category extends AbstractEntity
         return $this->parent;
     }
 
-
+    /**
+     * @return bool
+     */
+    public function needExcludeFromCashFlow()
+    {
+        return $this->excludeFromCashflow ? true : false;
+    }
 }
