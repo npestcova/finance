@@ -1,17 +1,17 @@
 <?php $this->headScript()->appendFile($this->basePath('js/view/transaction/FinTransactions.js'));?>
 
-<div class="jumbotron">
-    <form id="filter_form">
-        <div class="form-group row">
-            <div class="col-xs-2">
+<div class="jumbotron bg-light pt-0" >
+    <form id="filter_form" class="pt-4">
+        <div class="form-group row bg-warning text-white pl-3">
+            <div class="col-sm-2 p-1">
                 <label for="date_from">Date From</label>
                 <input class="form-control datepicker" id="date_from" type="text" value="<?= $this->dateFrom;?>">
             </div>
-            <div class="col-xs-2">
+            <div class="col-sm-2 p-1">
                 <label for="date_to">Date To</label>
                 <input class="form-control datepicker" id="date_to" type="text" value="<?= $this->dateTo;?>">
             </div>
-            <div class="col-xs-2">
+            <div class="col-sm-2 p-1">
                 <label for="account_id">Account</label>
                 <select class="form-control" id="account_id">
                     <?php foreach ($this->accounts as $accountId => $accountName) : ?>
@@ -19,7 +19,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-xs-2">
+            <div class="col-sm-2 p-1">
                 <label for="category_id">Category</label>
                 <select class="form-control" id="category_id">
                     <?php foreach ($this->categories as $categoryId => $categoryName) : ?>
@@ -27,34 +27,36 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-xs-4">
+            <div class="col-sm-3 p-1">
                 <label for="description">Description</label>
                 <input class="form-control" id="description" type="text">
+            </div>
+            <div class="col-sm-1 p-1">
+                <label for="">&nbsp;</label><br/>
+                <button id="reload" type="button" class="btn btn-secondary mb-2" onclick="doTableReload()">Filter</button>
             </div>
         </div>
     </form>
 
-    <button id="reload" type="button" class="btn btn-info" onclick="doTableReload()">Filter</button>
-    <br/>
-    <br/>
 	<form id="transaction_form">
-		<div class="form-group row">
-			<div class="col-xs-2">
+		<div class="form-group row bg-primary text-white pl-3 pt-3 pb-3">
+			<div class="col-sm-2 p-1">
 				<label for="category_id">Set Category</label>
+            </div>
+            <div class="col-sm-3 p-1">
 				<select class="form-control" id="new_category_id" name="new_category_id">
 					<?php foreach ($this->categories as $categoryId => $categoryName) : ?>
 						<option value="<?= $categoryId; ?>"><?= $categoryName;?></option>
 					<?php endforeach; ?>
 				</select>
 			</div>
-			<div class="col-xs-2">
-				<label> </label><br/>
-				<button id="apply" type="button" class="btn btn-info" onclick="applyChanges()">Apply</button>
+			<div class="col-sm-2 p-1">
+				<button id="apply" type="button" class="btn btn-outline-light" onclick="applyChanges()">Apply</button>
 			</div>
 			
 		</div>
 		<table id="transactions" class="display" width="100%"></table>
-        <div class="col-xs-4">
+        <div class="col-sm-4">
             <label for="description">Total: <span id="transaction_total"></span></label>
         </div>
 	</form>
