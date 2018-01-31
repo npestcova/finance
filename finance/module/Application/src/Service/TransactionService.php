@@ -163,7 +163,7 @@ class TransactionService extends AbstractService
 
             if (!isset($parentCategories[$mainCategoryId]->subCategories[$subCategoryId])) {
                 $subCategoryTotal = new CategoryTotalDto();
-                $subCategoryTotal->categoryId = $mainCategoryId;
+                $subCategoryTotal->categoryId = $subCategoryId;
                 $subCategoryTotal->categoryName = $subCategory->getName();
                 $subCategoryTotal->startDate = $inputDto->startDate;
                 $subCategoryTotal->endDate = $inputDto->endDate;

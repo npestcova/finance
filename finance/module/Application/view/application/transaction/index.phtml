@@ -2,7 +2,7 @@
 
 <div class="jumbotron bg-light pt-0" >
     <form id="filter_form" class="pt-4">
-        <div class="form-group row bg-warning text-white pl-3">
+        <div class="form-group row bg-warning text-white pl-3 rounded">
             <div class="col-sm-2 p-1">
                 <label for="date_from">Date From</label>
                 <input class="form-control datepicker" id="date_from" type="text" value="<?= $this->dateFrom;?>">
@@ -23,7 +23,7 @@
                 <label for="category_id">Category</label>
                 <select class="form-control" id="category_id">
                     <?php foreach ($this->categories as $categoryId => $categoryName) : ?>
-                        <option value="<?= $categoryId; ?>"><?= $categoryName;?></option>
+                        <option value="<?= $categoryId; ?>" <?=$this->categoryId == $categoryId ? 'selected' : ''?>><?= $categoryName;?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -39,7 +39,7 @@
     </form>
 
 	<form id="transaction_form">
-		<div class="form-group row bg-primary text-white pl-3 pt-3 pb-3">
+		<div class="form-group row bg-primary text-white pl-3 pt-3 pb-3 rounded">
 			<div class="col-sm-2 p-1">
 				<label for="category_id">Set Category</label>
             </div>

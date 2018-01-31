@@ -12,6 +12,7 @@ namespace Application\Controller;
 use Application\Dto\Transaction\GetTotalsByCategoryInputDto;
 use Application\Dto\Transaction\TransactionSearchDto;
 use Application\Dto\Transaction\BulkChangeTransactionsDto;
+use Application\Entity\Category;
 use Application\Service\AccountService;
 use Application\Service\CategoryService;
 use Application\Service\TransactionService;
@@ -46,13 +47,23 @@ class TransactionController extends AbstractActionController
     {
         $categoriesList = $this->categoryService->getCategoryNames();
         $accountsList = $this->accountService->getAccountNames();
-        $dateFrom = Date::getViewDateFromTimestamp(strtotime('-1 month'));
-        $dateTo = Date::getViewDateFromTimestamp(time());
+        $dateFrom = $this->params()->fromQuery('date_from', '');
+        $dateFrom = $dateFrom
+            ? Date::getViewDate($dateFrom)
+            : Date::getViewDateFromTimestamp(strtotime('-1 month'));
+
+        $dateTo = $this->params()->fromQuery('date_to', '');
+        $dateTo = $dateTo
+            ? Date::getViewDate($dateTo)
+            : Date::getViewDateFromTimestamp(time());
+
+        $categoryId = $this->params()->fromQuery('category_id', CategoryService::NO_FILTER);
 
         return new ViewModel([
             'dateFrom' => $dateFrom,
             'dateTo' => $dateTo,
             'categories' => $categoriesList,
+            'categoryId' => $categoryId,
             'accounts' => $accountsList,
         ]);
     }

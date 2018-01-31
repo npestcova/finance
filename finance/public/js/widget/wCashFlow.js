@@ -14,13 +14,26 @@ wCashFlow = {
     },
 
     initDates: function() {
-        this.options.startDate = new Date();
+        this.options.startDate = this.getUTCLocalDate();
         this.options.startDate.setDate(1);
 
-        this.options.endDate = new Date();
+        this.options.endDate = this.getUTCLocalDate();
 
         var monthName = this.getMonthName(this.options.startDate);
         this.options.title = 'Cash Flow (' + monthName + ')';
+    },
+
+    getUTCLocalDate: function () {
+        var target = new Date();
+        var offset = target.getTimezoneOffset();
+        var Y = target.getUTCFullYear();
+        var M = target.getUTCMonth();
+        var D = target.getUTCDate();
+        var h = target.getUTCHours();
+        var m = target.getUTCMinutes();
+        var s = target.getUTCSeconds();
+
+        return new Date(Date.UTC(Y, M, D, h, m - offset, s));
     },
 
     refresh: function() {
@@ -76,8 +89,13 @@ wCashFlow = {
     getRowHtml: function (row) {
         var balance = parseFloat(row.amount);
         var balanceClass = balance > 0 ? 'badge-primary' : 'badge-info';
+        var link = '/transaction?' +
+            'date_from=' + row.startDate +
+            '&date_to=' + row.endDate +
+            '&category_id=' + row.categoryId;
+
         return '<li class="list-group-item d-flex justify-content-between align-items-center">' +
-            row.categoryName +
+            '<a href="' + link + '">' + row.categoryName + '</a>' +
             '<span class="badge ' + balanceClass + ' badge-pill">$' + balance.toFixed(2) + '</span>' +
             '</li>';
     }
