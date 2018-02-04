@@ -57,6 +57,16 @@ return [
                     ],
                 ],
             ],
+            'cashflow' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/cashflow[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\CashflowController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
             'keywords' => [
                 'type' => Segment::class,
                 'options' => [
@@ -74,6 +84,7 @@ return [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\ImportController::class => Controller\Factory\ImportControllerFactory::class,
             Controller\TransactionController::class => Controller\Factory\TransactionControllerFactory::class,
+            Controller\CashflowController::class => Controller\Factory\CashflowControllerFactory::class,
             Controller\KeywordController::class => Controller\Factory\KeywordControllerFactory::class,
         ],
     ],

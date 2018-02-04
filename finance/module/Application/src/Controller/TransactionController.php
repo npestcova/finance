@@ -12,7 +12,6 @@ namespace Application\Controller;
 use Application\Dto\Transaction\GetTotalsByCategoryInputDto;
 use Application\Dto\Transaction\TransactionSearchDto;
 use Application\Dto\Transaction\BulkChangeTransactionsDto;
-use Application\Entity\Category;
 use Application\Service\AccountService;
 use Application\Service\CategoryService;
 use Application\Service\TransactionService;

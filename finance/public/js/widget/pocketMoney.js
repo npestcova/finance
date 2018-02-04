@@ -41,8 +41,13 @@ PocketMoney = {
     getRowHtml: function (row) {
         var balance = parseFloat(row.amount);
         var balanceClass = balance > 0 ? 'badge-primary' : 'badge-warning';
+
+        var link = '/transaction?' +
+            'date_from=' + row.startDate +
+            '&date_to=' + row.endDate +
+            '&category_id=' + row.categoryId;
         return '<li class="list-group-item d-flex justify-content-between align-items-center">' +
-            row.categoryName +
+            '<a href="' + link + '">' + row.categoryName + '</a>' +
             '<span class="badge ' + balanceClass + ' badge-pill">$' + balance.toFixed(2) + '</span>' +
             '</li>';
     }

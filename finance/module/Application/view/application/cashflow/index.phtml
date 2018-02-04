@@ -1,0 +1,43 @@
+<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+    <div class="btn-group" role="group">
+        <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <?= $this->selectedYear; ?>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+            <?php foreach ($this->years as $year) : ?>
+                <a class="dropdown-item" href="#"><?= $year; ?></a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <?php foreach ($this->months as $monthDigit => $monthName): ?>
+        <button type="button" class="btn <?= $monthDigit == $this->selectedMonth ? 'btn-primary' : 'btn-secondary'?>">
+            <?= $monthName; ?>
+        </button>
+    <?php endforeach; ?>
+
+
+</div>
+<div class="row">
+    <div class="col-sm-4">
+        <div id="cashflow_income" class="card bg-light mb-3 mt-3"  >in</div>
+    </div>
+    <div class="col-sm-4">
+        <div id="cashflow_outcome" class="card bg-light mb-3 mt-3" >out</div>
+    </div>
+    <div class="col-sm-4">
+        <div id="cashflow_outcome" class="card bg-light mb-3 mt-3" >total</div>
+    </div>
+</div>
+
+<script>
+    // PocketMoney.init({
+    //     url: '/transaction/pocket',
+    //     container: $('#widget_pocket_money')
+    // });
+    //
+    // wCashFlow.init({
+    //     url: '/transaction/cashflow',
+    //     container: $('#widget_cashflow')
+    // })
+</script>

@@ -8,6 +8,7 @@
 
 namespace Finance;
 
+
 class Date
 {
     const VIEW_DATE_FORMAT_DEFAULT = 'm/d/Y';
@@ -41,4 +42,21 @@ class Date
     {
         return date(self::VIEW_DATE_FORMAT_DEFAULT, $timestamp);
     }
+
+    /**
+     * @return array
+     */
+    public static function getMonthsNames()
+    {
+        $names = [];
+
+        $date = new \DateTime();
+        for ($i=1; $i <= 12; $i++) {
+            $date->setDate(2001, $i, 1);
+            $names[$i] = $date->format('M');
+        }
+
+        return $names;
+    }
+
 }
