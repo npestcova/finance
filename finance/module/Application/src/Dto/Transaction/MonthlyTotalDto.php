@@ -11,7 +11,18 @@ namespace Application\Dto\Transaction;
 
 class MonthlyTotalDto
 {
+    /** @var string */
     public $period;
+
+    /** @var string */
+    public $startDate;
+
+    /** @var string */
+    public $endDate;
+
+    /** @var string */
     public $title;
+
+    /** @var float */
     public $total;
 }

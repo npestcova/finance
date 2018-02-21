@@ -1,6 +1,7 @@
 FinCashflow = {
     options: {
         url: null,
+        totalsUrl: null,
         incomeContainer: null,
         expenseContainer: null,
         totalsContainer: null,
@@ -59,13 +60,13 @@ FinCashflow = {
 
         var html = '';
 
-        html += '<div class="card-header bg-warning text-white">' + title + '</div>';
+        html += '<div class="card-header bg-warning text-white pt-1 pb-1">' + title + '</div>';
         html += '<div class="card-body p-2">';
         html += '<ul class="list-group">' + mainList + '</ul>';
         html += '</div>';
 
         if (excludeList) {
-            html += '<div class="card-header bg-light text-secondary">Exclude From Cash Flow:</div>';
+            html += '<div class="card-header bg-light text-secondary pt-1 pb-1">Exclude From Cash Flow:</div>';
             html += '<div class="card-body p-2">';
             html += '<ul class="list-group">' + excludeList + '</ul>';
             html += '</div>';
@@ -99,6 +100,47 @@ FinCashflow = {
     },
 
     refreshTotals: function () {
+        var self = this;
 
+        $.ajax({
+            url: self.options.totalsUrl,
+            method: 'GET',
+            data: {},
+            dataType: 'json'
+        }).done(function(data) {
+            self.setTotals(data.rows);
+        })
+            .fail(function() {
+                alert( "error" );
+            });
+    },
+
+    setTotals: function (rows) {
+        var list = '';
+        for (i = 0; i < rows.length; i++) {
+            list += this.getTotalsRowHtml(rows[i]);
+        }
+
+        var html = '';
+
+        html += '<div class="card-header bg-success text-white pt-1 pb-1">Totals</div>';
+        html += '<div class="card-body p-2">';
+        html += '<ul class="list-group">' + list + '</ul>';
+        html += '</div>';
+
+        this.options.totalsContainer.html(html);
+    },
+
+    getTotalsRowHtml: function (row) {
+        var balance = parseFloat(row.total);
+        var balanceClass = balance > 0 ? 'badge-primary' : 'badge-danger';
+        var link = '/transaction?' +
+            'date_from=' + row.startDate +
+            '&date_to=' + row.endDate;
+
+        return '<li class="list-group-item d-flex justify-content-between align-items-center p-1 pl-2 pr-2">' +
+            '<a href="' + link + '" class="text-dark">' + row.title + '</a>' +
+            '<span class="badge ' + balanceClass + ' badge-pill">$' + balance.toFixed(2) + '</span>' +
+            '</li>';
     }
 };

@@ -28,13 +28,14 @@
         <div id="cashflow_expense" class="card bg-light mb-3 mt-3" ></div>
     </div>
     <div class="col-sm-4">
-        <div id="cashflow_total" class="card bg-light mb-3 mt-3" >total</div>
+        <div id="cashflow_total" class="card bg-light mb-3 mt-3" ></div>
     </div>
 </div>
 
 <script>
     FinCashflow.init({
         url: '/cashflow/get',
+        totalsUrl: '/cashflow/monthly-totals',
         incomeContainer: $('#cashflow_income'),
         expenseContainer: $('#cashflow_expense'),
         totalsContainer: $('#cashflow_total'),

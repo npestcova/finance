@@ -115,7 +115,7 @@ class TransactionRepository extends AbstractRepository
         $queryBuilder = $this->createQueryBuilder('t')
             ->select('SUM(t.amount) as total')
             ->addSelect('substring(t.date, 1, 7) as period')
-            ->orderBy('period')
+            ->orderBy('period', 'DESC')
             ->groupBy('period');
 
         $queryBuilder->fromDate($inputDto->startDate)

@@ -238,7 +238,7 @@ class TransactionService extends AbstractService
 
     /**
      * @param GetMonthlyTotalsDto $inputDto
-     * @return array
+     * @return MonthlyTotalDto[]
      */
     public function getMonthlyTotals(GetMonthlyTotalsDto $inputDto)
     {
@@ -248,8 +248,10 @@ class TransactionService extends AbstractService
         foreach ($rowset as $row) {
             $total = new MonthlyTotalDto();
             $total->period = $row['period'];
+            $total->startDate = $row['period'] . '-01';
+            $total->endDate = date("Y-m-t", strtotime($total->startDate));
             $total->total = $row['total'];
-            $total->title = date("F Y", strtotime($row['period'] . '-01'));
+            $total->title = date("F Y", strtotime($total->startDate));
             $totals[] = $total;
         }
 

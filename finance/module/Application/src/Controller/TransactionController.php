@@ -8,8 +8,6 @@
 
 namespace Application\Controller;
 
-
-use Application\Dto\Transaction\GetTotalsByCategoryInputDto;
 use Application\Dto\Transaction\TransactionSearchDto;
 use Application\Dto\Transaction\BulkChangeTransactionsDto;
 use Application\Service\AccountService;
@@ -103,19 +101,6 @@ class TransactionController extends AbstractActionController
 
         return new JsonModel([
             'rows' => $rows,
-        ]);
-    }
-
-    public function cashflowAction()
-    {
-        $categoryTotalsDto = new GetTotalsByCategoryInputDto();
-        $categoryTotalsDto->showHierarchy = true;
-        $categoryTotalsDto->startDate = $this->params()->fromQuery('start_date', Date::getDbDate('now'));
-        $categoryTotalsDto->endDate = $this->params()->fromQuery('end_date', Date::getDbDate('now'));
-        $rows = $this->transactionService->getTotalsByCategory($categoryTotalsDto);
-
-        return new JsonModel([
-            'rows' => array_values($rows),
         ]);
     }
 }
