@@ -53,13 +53,12 @@ wCashFlow = {
     },
     getFormData: function() {
         return {
-            start_date: this.formatDate(this.options.startDate),
-            end_date: this.formatDate(this.options.endDate)
+            period: this.formatDate(this.options.startDate)
         };
     },
 
     formatDate: function(dateObj) {
-        return dateObj.toISOString().slice(0, 10);
+        return dateObj.toISOString().slice(0, 7);
     },
 
     getMonthName: function(dateObj) {

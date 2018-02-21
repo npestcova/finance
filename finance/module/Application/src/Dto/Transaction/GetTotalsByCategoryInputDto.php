@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: npestcova
- * Date: 1/20/2018
- * Time: 1:58 PM
- */
 
 namespace Application\Dto\Transaction;
 
@@ -23,5 +17,9 @@ class GetTotalsByCategoryInputDto
     /** @var bool  */
     public $excludeCashFlow = true;
 
+    /** @var bool  */
     public $showHierarchy = true;
+
+    /** @var string  */
+    public $type = '';
 }

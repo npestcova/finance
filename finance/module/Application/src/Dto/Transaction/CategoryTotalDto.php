@@ -28,4 +28,6 @@ class CategoryTotalDto
 
     /** @var CategoryTotalDto[] */
     public $subCategories = [];
+
+    public $excludeFromCashFlow = false;
 }

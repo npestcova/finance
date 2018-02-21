@@ -12,6 +12,8 @@ namespace Application\Service;
 use Application\Dto\Transaction\BulkChangeTransactionsDto;
 use Application\Dto\Transaction\CategoryTotalDto;
 use Application\Dto\Transaction\GetTotalsByCategoryInputDto;
+use Application\Dto\Transaction\GetMonthlyTotalsDto;
+use Application\Dto\Transaction\MonthlyTotalDto;
 use Application\Dto\Transaction\TransactionSearchDto;
 use Application\Dto\Transaction\TransactionSearchResultDto;
 use Application\Dto\Transaction\ViewInfoDto;
@@ -24,6 +26,9 @@ use Finance\Date;
 
 class TransactionService extends AbstractService
 {
+    const CASHFLOW_TYPE_INCOME = 'income';
+    const CASHFLOW_TYPE_EXPENSE = 'expense';
+
     /**
      * @var TransactionRepository
      */
@@ -104,9 +109,19 @@ class TransactionService extends AbstractService
     {
         $totals = $this->transactionRepository->findTotalsByCategory($inputDto);
 
+        $where = [];
+        if (!empty($inputDto->categoryIds)) {
+            $where['id'] = $inputDto->categoryIds;
+        }
+        if (!empty($inputDto->type)) {
+            $where['type'] = $inputDto->type == self::CASHFLOW_TYPE_INCOME
+                ? Category::TYPE_INCOME
+                : Category::TYPE_EXPENSE;
+        }
+
         /** @var Category[] $categories */
-        $categories = $inputDto->categoryIds
-            ? $this->categoryRepository->findBy(['id' => $inputDto->categoryIds])
+        $categories = !empty($where)
+            ? $this->categoryRepository->findBy($where)
             : $this->categoryRepository->findAll();
 
         /** @var Category[] $categoriesById */
@@ -126,21 +141,19 @@ class TransactionService extends AbstractService
             $parent = null;
             $subCategory = null;
 
-            if (isset($categoriesById[$categoryId])) {
-                $parent = $inputDto->showHierarchy
-                    ? $categoriesById[$categoryId]->getParent()
-                    : null;
-                if ($parent) {
-                    $mainCategoryId = $parent->getId();
-                    $subCategoryId = $categoryId;
-                    $subCategory = $categoriesById[$categoryId];
-                } else {
-                    $parent = $categoriesById[$categoryId];
-                }
+            if (!isset($categoriesById[$categoryId])) {
+                continue;
             }
 
-            if ($inputDto->excludeCashFlow && $parent->needExcludeFromCashFlow()) {
-                continue;
+            $parent = $inputDto->showHierarchy
+                ? $categoriesById[$categoryId]->getParent()
+                : null;
+            if ($parent) {
+                $mainCategoryId = $parent->getId();
+                $subCategoryId = $categoryId;
+                $subCategory = $categoriesById[$categoryId];
+            } else {
+                $parent = $categoriesById[$categoryId];
             }
 
             if (!isset($parentCategories[$mainCategoryId])) {
@@ -151,6 +164,7 @@ class TransactionService extends AbstractService
                 $parentTotal->endDate = $inputDto->endDate;
                 $parentTotal->amount = 0;
                 $parentTotal->subCategories = [];
+                $parentTotal->excludeFromCashFlow = $parent->needExcludeFromCashFlow();
 
                 $parentCategories[$mainCategoryId] = $parentTotal;
             }
@@ -168,6 +182,7 @@ class TransactionService extends AbstractService
                 $subCategoryTotal->startDate = $inputDto->startDate;
                 $subCategoryTotal->endDate = $inputDto->endDate;
                 $subCategoryTotal->amount = 0;
+                $subCategoryTotal->excludeFromCashFlow = $subCategory->needExcludeFromCashFlow();
 
                 $parentCategories[$mainCategoryId]->subCategories[$subCategoryId] = $subCategoryTotal;
             }
@@ -221,4 +236,23 @@ class TransactionService extends AbstractService
         return array_values($rows);
     }
 
+    /**
+     * @param GetMonthlyTotalsDto $inputDto
+     * @return array
+     */
+    public function getMonthlyTotals(GetMonthlyTotalsDto $inputDto)
+    {
+        $rowset = $this->transactionRepository->findMonthlyTotals($inputDto);
+
+        $totals = [];
+        foreach ($rowset as $row) {
+            $total = new MonthlyTotalDto();
+            $total->period = $row['period'];
+            $total->total = $row['total'];
+            $total->title = date("F Y", strtotime($row['period'] . '-01'));
+            $totals[] = $total;
+        }
+
+        return $totals;
+    }
 }

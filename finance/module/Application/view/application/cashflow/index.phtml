@@ -1,3 +1,5 @@
+<?php $this->headScript()->appendFile($this->basePath('js/view/cashflow/FinCashflow.js'));?>
+
 <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
     <div class="btn-group" role="group">
         <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -5,32 +7,39 @@
         </button>
         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
             <?php foreach ($this->years as $year) : ?>
-                <a class="dropdown-item" href="#"><?= $year; ?></a>
+                <a class="dropdown-item" href="javascript:void(0)"><?= $year; ?></a>
             <?php endforeach; ?>
         </div>
     </div>
 
     <?php foreach ($this->months as $monthDigit => $monthName): ?>
-        <button type="button" class="btn <?= $monthDigit == $this->selectedMonth ? 'btn-primary' : 'btn-secondary'?>">
+        <button type="button" class="btn period-month <?= $monthDigit == $this->selectedMonth ? 'btn-primary' : 'btn-secondary'?>"
+        onclick="FinCashflow.selectMonth(this, '<?=sprintf('%02d', $monthDigit );?>')">
             <?= $monthName; ?>
         </button>
     <?php endforeach; ?>
-
-
 </div>
+
 <div class="row">
     <div class="col-sm-4">
-        <div id="cashflow_income" class="card bg-light mb-3 mt-3"  >in</div>
+        <div id="cashflow_income" class="card bg-light mb-3 mt-3"  ></div>
     </div>
     <div class="col-sm-4">
-        <div id="cashflow_outcome" class="card bg-light mb-3 mt-3" >out</div>
+        <div id="cashflow_expense" class="card bg-light mb-3 mt-3" ></div>
     </div>
     <div class="col-sm-4">
-        <div id="cashflow_outcome" class="card bg-light mb-3 mt-3" >total</div>
+        <div id="cashflow_total" class="card bg-light mb-3 mt-3" >total</div>
     </div>
 </div>
 
 <script>
+    FinCashflow.init({
+        url: '/cashflow/get',
+        incomeContainer: $('#cashflow_income'),
+        expenseContainer: $('#cashflow_expense'),
+        totalsContainer: $('#cashflow_total'),
+        period: '<?= $this->selectedYear; ?>-<?= sprintf('%02d', $this->selectedMonth ); ?>'
+    });
     // PocketMoney.init({
     //     url: '/transaction/pocket',
     //     container: $('#widget_pocket_money')

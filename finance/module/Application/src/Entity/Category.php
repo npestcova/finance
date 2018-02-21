@@ -20,6 +20,9 @@ class Category extends AbstractEntity
     const DEFAULT_NAME = 'Uncategorized';
     const NAME_DELIMITER = '. ';
 
+    const TYPE_EXPENSE = 1;
+    const TYPE_INCOME = 2;
+
     /**
      * @var integer
      *
@@ -43,6 +46,13 @@ class Category extends AbstractEntity
      * @ORM\Column(name="exclude_from_cashflow", type="integer", length=1, nullable=false)
      */
     protected $excludeFromCashflow;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="type", type="integer", length=1, nullable=false)
+     */
+    protected $type = self::TYPE_EXPENSE;
 
     /**
      * @var Category[]

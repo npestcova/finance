@@ -9,9 +9,12 @@
 namespace Application\Controller;
 
 
+use Application\Dto\Transaction\GetTotalsByCategoryInputDto;
+use Application\Dto\Transaction\GetMonthlyTotalsDto;
 use Application\Service\TransactionService;
 use Finance\Date;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 class CashflowController extends AbstractActionController
@@ -38,6 +41,35 @@ class CashflowController extends AbstractActionController
             'selectedYear' => $selectedYear,
             'months' => $months,
             'selectedMonth' => $selectedMonth,
+        ]);
+    }
+
+    public function getAction()
+    {
+        $categoryTotalsDto = new GetTotalsByCategoryInputDto();
+        $categoryTotalsDto->showHierarchy = true;
+        $startDate = $this->params()->fromQuery('period', date("Y-m")) . '-01';
+        $categoryTotalsDto->startDate = $startDate;
+        $categoryTotalsDto->endDate = date("Y-m-t", strtotime($startDate));
+        $categoryTotalsDto->excludeCashFlow = $this->params()->fromQuery('excludeTransfers', 0);
+        $categoryTotalsDto->type = $this->params()->fromQuery('type', '');
+        $rows = $this->transactionService->getTotalsByCategory($categoryTotalsDto);
+
+        return new JsonModel([
+            'rows' => array_values($rows),
+        ]);
+    }
+
+    public function monthlyTotalsAction()
+    {
+        $totalsDto = new GetMonthlyTotalsDto();
+        $totalsDto->startDate = date("Y-m-01", strtotime('-1 year'));
+        $totalsDto->endDate = date("Y-m-t");
+
+        $rows = $this->transactionService->getMonthlyTotals($totalsDto);
+
+        return new JsonModel([
+            'rows' => array_values($rows),
         ]);
     }
 }

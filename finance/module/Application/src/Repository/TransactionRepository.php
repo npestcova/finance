@@ -9,6 +9,7 @@
 namespace Application\Repository;
 
 use Application\Dto\Transaction\BulkChangeTransactionsDto;
+use Application\Dto\Transaction\GetMonthlyTotalsDto;
 use Application\Dto\Transaction\GetTotalsByCategoryInputDto;
 use Application\Dto\Transaction\TransactionSearchDto;
 use Application\Entity\Category;
@@ -16,6 +17,7 @@ use Application\Entity\Transaction;
 use Application\QueryBuilder\TransactionQueryBuilder;
 use Application\Service\AccountService;
 use Application\Service\CategoryService;
+use Application\Service\TransactionService;
 
 class TransactionRepository extends AbstractRepository
 {
@@ -27,18 +29,14 @@ class TransactionRepository extends AbstractRepository
      */
     public function findTransactions(TransactionSearchDto $filter)
     {
+        /** @var TransactionQueryBuilder $qb */
         $qb = $this->createQueryBuilder('t');
 
         $qb->where('1=1');
 
-        if ($filter->dateFrom) {
-            $qb->andWhere('t.date >= :dateFrom')
-                ->setParameter('dateFrom', $filter->dateFrom);
-        }
-        if ($filter->dateTo) {
-            $qb->andWhere('t.date <= :dateTo')
-                ->setParameter('dateTo', $filter->dateTo);
-        }
+        $qb->fromDate($filter->dateFrom)
+            ->toDate($filter->dateTo);
+
         if ($filter->accountId != AccountService::NO_FILTER) {
             $qb->andWhere('t.account = :accountId')
                 ->setParameter('accountId', $filter->accountId);
@@ -83,24 +81,48 @@ class TransactionRepository extends AbstractRepository
      */
     public function findTotalsByCategory(GetTotalsByCategoryInputDto $inputDto)
     {
+        /** @var TransactionQueryBuilder $queryBuilder */
         $queryBuilder = $this->createQueryBuilder('t')
             ->select('SUM(t.amount) as total')
             ->addSelect('IDENTITY(t.category) as category_id')
             ->groupBy('t.category');
 
-        if (!empty($inputDto->categoryIds)) {
-            $queryBuilder->andWhere('t.category in (:categories)')
-                ->setParameter('categories', $inputDto->categoryIds);
+        $queryBuilder->fromDate($inputDto->startDate)
+            ->toDate($inputDto->endDate)
+            ->fromCategories($inputDto->categoryIds);
+
+        if (!empty($inputDto->type)) {
+            $type = $inputDto->type == TransactionService::CASHFLOW_TYPE_INCOME
+                ? Category::TYPE_INCOME
+                : Category::TYPE_EXPENSE;
+
+            $queryBuilder->leftJoin('t.category', 'c')
+                ->andWhere('c.type = :categoryType')
+                ->setParameter('categoryType', $type);
         }
 
-        if (!empty($inputDto->startDate)) {
-            $queryBuilder->andWhere('t.date >= :startDate')
-                ->setParameter('startDate', $inputDto->startDate);
-        }
+        $result = $queryBuilder->getQuery()->getResult();
+        return $result;
+    }
 
-        if (!empty($inputDto->endDate)) {
-            $queryBuilder->andWhere('t.date <= :endDate')
-                ->setParameter('endDate', $inputDto->endDate);
+    /**
+     * @param $inputDto
+     * @return array
+     */
+    public function findMonthlyTotals(GetMonthlyTotalsDto $inputDto)
+    {
+        /** @var TransactionQueryBuilder $queryBuilder */
+        $queryBuilder = $this->createQueryBuilder('t')
+            ->select('SUM(t.amount) as total')
+            ->addSelect('substring(t.date, 1, 7) as period')
+            ->orderBy('period')
+            ->groupBy('period');
+
+        $queryBuilder->fromDate($inputDto->startDate)
+            ->toDate($inputDto->endDate);
+
+        if ($inputDto->excludeTransfers) {
+            $queryBuilder->excludeTransfers();
         }
 
         $result = $queryBuilder->getQuery()->getResult();
