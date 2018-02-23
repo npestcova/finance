@@ -9,6 +9,12 @@ FinCashflow = {
         period: null
     },
 
+    loaded: {
+        income: false,
+        expenses: false,
+        totals: false
+    },
+
     init: function(options) {
         $.extend(this.options, options);
         this.refreshMonthlyData(null);
@@ -19,11 +25,11 @@ FinCashflow = {
         if (period) {
             this.options.period = period;
         }
-        this.loadData(this.options.incomeContainer, {type: 'income'}, 'Income');
-        this.loadData(this.options.expenseContainer, {type: 'expense'}, 'Expenses');
+        this.loadData(this.options.incomeContainer, {type: 'income'}, 'Income', 'income');
+        this.loadData(this.options.expenseContainer, {type: 'expense'}, 'Expenses', 'expense');
     },
 
-    loadData: function(container, params, title) {
+    loadData: function(container, params, title, type) {
         var self = this;
 
         $.ajax({
@@ -33,6 +39,13 @@ FinCashflow = {
             dataType: 'json'
         }).done(function(data) {
             self.setData(data.rows, container, title);
+            if (type === 'income') {
+                self.loaded.income = true;
+            } else {
+                self.loaded.expenses = true;
+            }
+            self.showContent();
+
         })
             .fail(function() {
                 alert( "error" );
@@ -95,7 +108,6 @@ FinCashflow = {
         var $button = $(button);
         $button.parent().find('.period-month').removeClass('btn-primary').addClass('btn-secondary');
         $button.removeClass('btn-secondary').addClass('btn-primary');
-        console.log(newPeriod);
         this.refreshMonthlyData(newPeriod);
     },
 
@@ -109,6 +121,8 @@ FinCashflow = {
             dataType: 'json'
         }).done(function(data) {
             self.setTotals(data.rows);
+            self.loaded.totals = true;
+            self.showContent();
         })
             .fail(function() {
                 alert( "error" );
@@ -142,5 +156,12 @@ FinCashflow = {
             '<a href="' + link + '" class="text-dark">' + row.title + '</a>' +
             '<span class="badge ' + balanceClass + ' badge-pill">$' + balance.toFixed(2) + '</span>' +
             '</li>';
+    },
+
+    showContent: function (row) {
+        if (!this.loaded.income || !this.loaded.expenses || !this.loaded.totals) {
+            return;
+        }
+        $('.show-on-load').removeClass('d-none');
     }
 };
