@@ -2,19 +2,18 @@
 
 namespace Application\Controller\Factory;
 
-
-use Application\Controller\CashflowController;
+use Application\Controller\BudgetController;
 use Application\Service\TransactionService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class CashflowControllerFactory implements FactoryInterface
+class BudgetControllerFactory implements FactoryInterface
 {
     /**
      * @param ContainerInterface $container
      * @param string $requestedName
      * @param array|null $options
-     * @return CashflowController|object
+     * @return BudgetController|object
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
@@ -23,7 +22,7 @@ class CashflowControllerFactory implements FactoryInterface
         $transactionService = $container->get(TransactionService::class);
 
         // Instantiate the controller and inject dependencies
-        return new CashflowController(
+        return new BudgetController(
             $transactionService
         );
     }

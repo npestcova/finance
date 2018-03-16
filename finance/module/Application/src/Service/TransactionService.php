@@ -244,6 +244,12 @@ class TransactionService extends AbstractService
     {
         $rowset = $this->transactionRepository->findMonthlyTotals($inputDto);
 
+        $yearToDate = new MonthlyTotalDto();
+        $yearToDate->period = '';
+        $yearToDate->startDate = '';
+        $yearToDate->total = 0;
+        $yearToDate->title = 'Year To Date';
+
         $totals = [];
         foreach ($rowset as $row) {
             $total = new MonthlyTotalDto();
@@ -253,6 +259,16 @@ class TransactionService extends AbstractService
             $total->total = $row['total'];
             $total->title = date("F Y", strtotime($total->startDate));
             $totals[] = $total;
+
+            $yearToDate->total += $row['total'];
+            $yearToDate->startDate = $yearToDate->startDate
+                ? min($yearToDate->startDate, $total->startDate)
+                : $total->startDate;
+            $yearToDate->endDate = max($yearToDate->endDate, $total->endDate);
+        }
+
+        if ($inputDto->addYearToDate) {
+            $totals[] = $yearToDate;
         }
 
         return $totals;

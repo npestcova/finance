@@ -1,0 +1,23 @@
+<?= $this->partial('application/budget/charts.phtml', [
+    'income' => [
+        'received' => 5324.34,
+        'budgeted' => 11039.34
+    ],
+    'expense' => [
+        'spent' => 1231.34,
+        'budgeted' => 6564.34
+    ]]); ?>
+
+<?= $this->partial('application/budget/unbudgeted.phtml', ['var'=> 123]); ?>
+
+<?php return; ?>
+<?= $this->partial('application/budget/budgeted.phtml', ['var'=> 123]); ?>
+
+
+
+
+
+
+
+
+

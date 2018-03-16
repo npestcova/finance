@@ -111,6 +111,13 @@ FinCashflow = {
         this.refreshMonthlyData(newPeriod);
     },
 
+    selectYear: function(button, year) {
+        var month = this.options.period.substring(5, 7);
+        var newPeriod = year + '-' + month;
+        button.html(year);
+        this.refreshMonthlyData(newPeriod);
+    },
+
     refreshTotals: function () {
         var self = this;
 

@@ -1,5 +1,6 @@
-<?php $this->headScript()->appendFile($this->basePath('js/view/cashflow/FinCashflow.js'));?>
+<?php $this->headScript()->appendFile($this->basePath('js/view/budget/FinBudget.js'));?>
 
+<!-- top navigation -->
 <div class="row justify-content-center">
     <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
         <div class="btn-group" role="group">
@@ -22,26 +23,6 @@
     </div>
 </div>
 
-
-<div class="row show-on-load d-none">
-    <div class="col-sm-4">
-        <div id="cashflow_income" class="card bg-light mb-3 mt-3"  ></div>
-    </div>
-    <div class="col-sm-4">
-        <div id="cashflow_expense" class="card bg-light mb-3 mt-3" ></div>
-    </div>
-    <div class="col-sm-4">
-        <div id="cashflow_total" class="card bg-light mb-3 mt-3" ></div>
-    </div>
+<div id="month-budget">
+    <?= $this->partial('application/budget/content.phtml', ['data' => $this->data]); ?>
 </div>
-
-<script>
-    FinCashflow.init({
-        url: '/cashflow/get',
-        totalsUrl: '/cashflow/monthly-totals',
-        incomeContainer: $('#cashflow_income'),
-        expenseContainer: $('#cashflow_expense'),
-        totalsContainer: $('#cashflow_total'),
-        period: '<?= $this->selectedYear; ?>-<?= sprintf('%02d', $this->selectedMonth ); ?>'
-    });
-</script>

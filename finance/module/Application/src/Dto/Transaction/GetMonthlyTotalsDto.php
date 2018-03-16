@@ -12,4 +12,7 @@ class GetMonthlyTotalsDto
 
     /** @var bool  */
     public $excludeTransfers = true;
+
+    /** @var bool  */
+    public $addYearToDate = true;
 }

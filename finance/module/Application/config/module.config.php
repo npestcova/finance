@@ -67,6 +67,16 @@ return [
                     ],
                 ],
             ],
+            'budget' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/budget[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\BudgetController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
             'keywords' => [
                 'type' => Segment::class,
                 'options' => [
@@ -85,6 +95,7 @@ return [
             Controller\ImportController::class => Controller\Factory\ImportControllerFactory::class,
             Controller\TransactionController::class => Controller\Factory\TransactionControllerFactory::class,
             Controller\CashflowController::class => Controller\Factory\CashflowControllerFactory::class,
+            Controller\BudgetController::class => Controller\Factory\BudgetControllerFactory::class,
             Controller\KeywordController::class => Controller\Factory\KeywordControllerFactory::class,
         ],
     ],

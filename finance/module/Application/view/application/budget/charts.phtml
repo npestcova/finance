@@ -1,0 +1,23 @@
+<?php $this->headScript()->appendFile($this->basePath('js/library/chart/Chart.min.js'));?>
+<?php $this->headScript()->appendFile($this->basePath('js/view/budget/FinBudgetCharts.js'));?>
+
+<!-- income / expense charts -->
+<div id="charts" class="row justify-content-center">
+    <div id="income-canvas-holder" style="width:250px">
+        <canvas id="income-chart" width="100" height="100"></canvas>
+    </div>
+    <div id="expense-canvas-holder" style="width:250px">
+        <canvas id="expense-chart" width="100" height="100"></canvas>
+    </div>
+</div>
+
+<script>
+    FinBudgetCharts.init({
+        incomeCtx: $('#income-chart'),
+        incomeReceived: <?= $this->income['received'];?>,
+        incomeBudgeted: <?= $this->income['budgeted'];?>,
+        expenseCtx: $('#expense-chart'),
+        expenseSpent: <?= $this->expense['spent'];?>,
+        expenseBudgeted: <?= $this->expense['budgeted'];?>
+    });
+</script>
