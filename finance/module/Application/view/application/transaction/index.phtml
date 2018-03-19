@@ -63,11 +63,13 @@
 </div>
 
 <script>
+    var transactionsTable =  $('#transactions');
+
     doTableReload = function() {
-        FinTransactions.reload();
+        transactionsTable.FinTransactions('reload');
     };
     applyChanges = function() {
-        FinTransactions.applyChanges();
+        transactionsTable.FinTransactions('applyChanges');
     };
 
     $(document).ready(function() {
@@ -75,10 +77,10 @@
             format: 'mm/dd/yyyy'
         });
 
-        FinTransactions.init({
+        transactionsTable.FinTransactions({
             url: '/transaction/load',
             saveUrl: '/transaction/save',
-            table: $('#transactions'),
+            table: transactionsTable,
             filterForm: $('#filter_form'),
 			form: $('#transaction_form'),
         })

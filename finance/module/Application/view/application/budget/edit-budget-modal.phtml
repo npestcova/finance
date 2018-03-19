@@ -1,0 +1,57 @@
+<?php $this->headScript()->appendFile($this->basePath('js/view/transaction/FinTransactions.js'));?>
+<!-- Modal -->
+<div class="modal fade" id="<?= $this->modalId;?>" tabindex="-1" role="dialog" aria-labelledby="<?= $this->modalId;?>Title" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="<?= $this->modalId;?>Title"><?= $this->title;?></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body container">
+                <div class="row">
+                    <div class="col">
+                        <form>
+                            <div class="form-group row">
+                                <label for="inputBudget" class="col-sm-2 col-form-label">Budget</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="inputBudget" placeholder="0.00">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col">
+                        table with statistics
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <form id="<?= $this->modalId;?>filter_form" class="invisible">
+                            <input type="hidden" id="date_from" type="text" value="<?= $this->dateFrom;?>" />
+                            <input type="hidden" id="date_to" type="text" value="<?= $this->dateTo;?>" />
+                            <input type="hidden" id="account_id" type="text" value="-1" />
+                            <input type="hidden" id="category_id" type="text" value="59" />
+                            <input type="hidden" id="description" type="text" value="" />
+                        </form>
+                        <table id="<?= $this->modalId;?>transactions" class="display" width="100%"></table>
+                        <script>
+                            $(document).ready(function() {
+                                $('#<?= $this->modalId;?>transactions').FinTransactions({
+                                    url: '/transaction/load',
+                                    saveUrl: '/transaction/save',
+                                    table: $('#<?= $this->modalId;?>transactions'),
+                                    filterForm: $('#<?= $this->modalId;?>filter_form'),
+                                })
+                            } );
+                        </script>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-FinTransactions = {
+jQuery.widget ("custom.FinTransactions", {
     options: {
         url: '',
 		saveUrl: '',
@@ -27,12 +27,12 @@ FinTransactions = {
         ]
     },
 
-    init: function(params) {
-        this.options.table = params.table;
-        this.options.url = params.url;
-        this.options.saveUrl = params.saveUrl;
-        this.options.filterForm = params.filterForm;
-        this.options.form = params.form;
+    _create: function(options) {
+        // this.options.table = params.table;
+        // this.options.url = params.url;
+        // this.options.saveUrl = params.saveUrl;
+        // this.options.filterForm = params.filterForm;
+        // this.options.form = params.form;
 
         this.initDataTable();
 		this.bindEvents();
@@ -134,4 +134,4 @@ FinTransactions = {
     clear: function() {
         this.options.dataTableObj.fnClearTable();
     }
-};
+});

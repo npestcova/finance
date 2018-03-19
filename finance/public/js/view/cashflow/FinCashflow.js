@@ -144,7 +144,7 @@ FinCashflow = {
 
         var html = '';
 
-        html += '<div class="card-header bg-success text-white pt-1 pb-1">Totals</div>';
+        html += '<div class="card-header bg-success text-white pt-1 pb-1">Leftover</div>';
         html += '<div class="card-body p-2">';
         html += '<ul class="list-group">' + list + '</ul>';
         html += '</div>';

@@ -22,11 +22,12 @@
 
         <!-- Scripts -->
         <?= $this->headScript()
-            ->appendFile($this->basePath('js/library/jquery/jquery-3.1.0.min.js'))
-            ->appendFile($this->basePath('js/library/popper/popper.min.js'))
-            ->appendFile($this->basePath('js/library/bootstrap/4.0/bootstrap.min.js'))
-            ->appendFile($this->basePath('js/library/datatables/datatables.min.js'))
-            ->appendFile($this->basePath('js/library/bootstrap/datepicker/bootstrap-datepicker.min.js'))
+            ->prependFile($this->basePath('js/library/bootstrap/datepicker/bootstrap-datepicker.min.js'))
+            ->prependFile($this->basePath('js/library/datatables/datatables.min.js'))
+            ->prependFile($this->basePath('js/library/bootstrap/4.0/bootstrap.min.js'))
+            ->prependFile($this->basePath('js/library/popper/popper.min.js'))
+            ->prependFile($this->basePath('js/library/jquery/jquery-ui.min.js'))
+            ->prependFile($this->basePath('js/library/jquery/jquery-3.1.0.min.js'))
 
         ?>
     </head>
