@@ -99,6 +99,16 @@ return [
             Controller\KeywordController::class => Controller\Factory\KeywordControllerFactory::class,
         ],
     ],
+    'view_helpers' => [
+        'factories' => [
+            View\Helper\Menu::class => View\Helper\Factory\MenuFactory::class,
+            View\Helper\Breadcrumbs::class => InvokableFactory::class,
+        ],
+        'aliases' => [
+            'mainMenu' => View\Helper\Menu::class,
+            'pageBreadcrumbs' => View\Helper\Breadcrumbs::class,
+        ],
+    ],
     'view_manager' => [
         'display_not_found_reason' => true,
         'display_exceptions'       => true,

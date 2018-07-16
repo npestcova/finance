@@ -19,7 +19,22 @@ return [
     'Zend\Hydrator',
     'Zend\Router',
     'Zend\Validator',
+
+    'Zend\Mail',
+    'Zend\Cache',
+    'Zend\Paginator',
+    'Zend\I18n',
+    'Zend\InputFilter',
+    'Zend\Filter',
+    'Zend\Session',
+    'Zend\Mvc\Plugin\Prg',
+    'Zend\Mvc\Plugin\Identity',
+    'Zend\Mvc\Plugin\FlashMessenger',
+    'Zend\Mvc\Plugin\FilePrg',
+    'Zend\Form',
+
     'DoctrineModule',
     'DoctrineORMModule',
     'Application',
+    'User',
 ];
