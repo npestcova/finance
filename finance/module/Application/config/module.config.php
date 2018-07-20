@@ -99,6 +99,11 @@ return [
             Controller\KeywordController::class => Controller\Factory\KeywordControllerFactory::class,
         ],
     ],
+    'service_manager' => [
+        'factories' => [
+            Service\NavManager::class => Service\Factory\NavManagerFactory::class,
+        ],
+    ],
     'view_helpers' => [
         'factories' => [
             View\Helper\Menu::class => View\Helper\Factory\MenuFactory::class,

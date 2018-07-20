@@ -1,0 +1,22 @@
+<?php
+$item = $this->item;
+$currentUrl = $this->url();
+$itemUrl = !empty($item['link']) ? $this->url($item['link']) : '';
+?>
+
+<?php if (!empty($item['dropdown'])): ?>
+    <li class="nav-item dropdown">
+        <a href="javascript:void(0)" class="nav-link dropdown-toggle" data-toggle="dropdown">
+            <?= $item['label']; ?> <b class="caret"></b>
+        </a>
+        <ul class="dropdown-menu navbar-dark  bg-primary">
+            <?php foreach ($item['dropdown'] as $subItem) : ?>
+                <?= $this->render('layout/nav-item.phtml', ['item' => $subItem]); ?>
+            <?php endforeach; ?>
+        </ul>
+    </li>
+<?php else: ?>
+    <li class="nav-item <?= $currentUrl == $itemUrl ? 'active' : ''?>">
+        <a class="nav-link" href="<?= $itemUrl ?>"><?= $item['label']; ?></a>
+    </li>
+<?php endif; ?>

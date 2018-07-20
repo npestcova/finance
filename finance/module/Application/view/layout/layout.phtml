@@ -32,33 +32,18 @@
         ?>
     </head>
     <body>
-    <nav class="navbar fixed-top navbar-expand-lg navbar-dark  bg-primary ">
-        <a class="navbar-brand" href="<?= $this->url('home') ?>">Finance</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <?php
-                $menu = [
-                    'home' => 'Dashboard',
-                    'transaction' => 'Transactions',
-                    'cashflow' => 'CashFlow',
-                    'budget' => 'Budget',
-                    'keywords' => 'Keywords',
-                    'import' => 'Import',
-                ];
-                $currentUrl = $this->url();
-                ?>
-                <?php foreach ($menu as $link => $title) : ?>
-                    <li class="nav-item <?= $currentUrl == $this->url($link) ? 'active' : ''?>">
-                        <a class="nav-link" href="<?= $this->url($link) ?>"><?= $title; ?></a>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    </nav>
+    <!-- Navigation bar -->
+    <?php
+    // Check if the activeMenuItemId passed to layout view model
+    // and if so, use it for setting active navbar item.
+    if (isset($activeMenuItemId)) {
+        $this->mainMenu()->setActiveItemId($activeMenuItemId);
+    }
+
+    // Render the navbar
+    echo $this->mainMenu()->render();
+    ?>
     <div class="container">
         <?= $this->content ?>
         <hr>
