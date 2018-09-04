@@ -30,7 +30,7 @@ class ImportController extends AbstractActionController
 
     public function csvFilesAction()
     {
-        $directory = 'C:/Home/finance/import/';
+        $directory = 'C:/Users/npestcova/OneDrive/Documents/finance/import/';
         $this->importService->importCsvFiles($directory);
         die('ok');
     }

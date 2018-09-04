@@ -216,7 +216,7 @@ class TransactionService extends AbstractService
             'Home' => 98,
             'Nata' => 99,
             'Alex' => 100,
-            'Baby' => 107
+            'Alice' => 107
         ];
         $categoryNames = array_flip($categories);
 

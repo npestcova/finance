@@ -1,6 +1,46 @@
 <?php
-$this->headTitle('Sign in');
+    $this->headTitle('Sign in');
+    $this->headLink()->appendStylesheet($this->basePath('css/user/auth/login.css'));
+    $this->headScript()->appendFile($this->basePath('js/view/user/login.js'));
+?>
 
+<form class="form-signin" id="form-signin" onsubmit="alert('oops'); return false;">
+    <div class="d-flex justify-content-center">
+        <img class="mb-4" src="/img/piggy-bank-g.png" alt="" width="144" height="144"><br/>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        <h1 class="h3 mb-3 font-weight-normal text-info">Please sign in</h1>
+    </div>
+    <div class="alert alert-warning" role="alert" style="display: none;"></div>
+
+    <label for="inputEmail" class="sr-only">Email address</label>
+    <input type="email" name="login" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+
+    <label for="inputPassword" class="sr-only">Password</label>
+    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+
+    <div class="checkbox mb-3">
+        <label>
+            <input type="checkbox" name="remember_me" value="1"> Remember me
+        </label>
+    </div>
+    <button id="login-submit" class="btn btn-lg btn-primary btn-block" type="button">Sign in</button>
+
+</form>
+
+<script>
+    FinLogin.init({
+        url: '/auth',
+        form: $('#form-signin'),
+        submitBtn: $('#login-submit'),
+        redirect_url: ''
+    })
+</script>
+<?php
+
+return;
+?>
 //$this->mainMenu()->setActiveItemId('login');
 
 $form->get('email')->setAttributes([

@@ -48,6 +48,16 @@ return [
                     ],
                 ],
             ],
+            'auth' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/auth',
+                    'defaults' => [
+                        'controller' => Controller\AuthController::class,
+                        'action'     => 'auth',
+                    ],
+                ],
+            ],
             'users' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -86,7 +96,7 @@ return [
             Controller\UserController::class => [
                 // Give access to "resetPassword", "message" and "setPassword" actions
                 // to anyone.
-                ['actions' => ['resetPassword', 'message', 'setPassword'], 'allow' => '*'],
+                ['actions' => ['resetPassword', 'message', 'setPassword', 'auth'], 'allow' => '*'],
                 // Give access to "index", "add", "edit", "view", "changePassword" actions to authorized users only.
                 ['actions' => ['index', 'add', 'edit', 'view', 'changePassword'], 'allow' => '@']
             ],
@@ -103,6 +113,9 @@ return [
     'view_manager' => [
         'template_path_stack' => [
             __DIR__ . '/../view',
+        ],
+        'strategies' => [
+            'ViewJsonStrategy',
         ],
     ],
     // We register module-provided view helpers under this key.
