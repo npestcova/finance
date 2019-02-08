@@ -25,7 +25,9 @@ class ImportService extends AbstractService
     const MAPPING_TYPE_CHASE_CC = 'chase-cc';
     const MAPPING_TYPE_BA = 'ba';
     const MAPPING_TYPE_CAPITAL_ONE = 'cap';
+    const MAPPING_TYPE_CAPITAL_ONE_MARKET = 'cap-market';
     const MAPPING_TYPE_BCU = 'bcu';
+    const MAPPING_TYPE_FIDELITY = 'fidelity';
 
     const COLUMN_DATE = 'Date';
     const COLUMN_DESCRIPTION = 'Description';
@@ -238,6 +240,16 @@ class ImportService extends AbstractService
             self::COLUMN_DEBIT => 6,
             self::COLUMN_CREDIT => 7,
 		];
+        $mapping[self::MAPPING_TYPE_CAPITAL_ONE_MARKET] = [
+            self::COLUMN_DATE => 7,
+            self::COLUMN_DESCRIPTION => 10,
+            self::COLUMN_AMOUNT => 8,
+        ];
+        $mapping[self::MAPPING_TYPE_FIDELITY] = [
+            self::COLUMN_DATE => 0,
+            self::COLUMN_DESCRIPTION => 2,
+            self::COLUMN_AMOUNT => 4,
+        ];
 
         if (isset($mapping[$mappingType])) {
             return $mapping[$mappingType];
@@ -256,12 +268,14 @@ class ImportService extends AbstractService
             'checking' => 'Checking Account',
             'saving' => 'Saving',
             'cap' => 'Capital One',
+            'money' => 'Capital Money Market',
             'amazon' => 'Amazon',
             'bcu' => 'BCU-checking',
             'bcu-rainy' => 'BCU-Rainy Day',
             'nick-bcu' => 'Nick BCU Checking',
             'nick-rainy' => 'Nick BCU RainyDay',
             'bankof' => 'Bank Of America',
+            'fidelity' => 'Fidelity Credit Card',
         ];
 
         return isset($accountNames[$type])
