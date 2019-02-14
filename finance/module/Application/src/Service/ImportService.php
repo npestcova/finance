@@ -220,9 +220,9 @@ class ImportService extends AbstractService
             self::COLUMN_AMOUNT => 3,
         ];
         $mapping[self::MAPPING_TYPE_CHASE_CC] = [
-            self::COLUMN_DATE => 2,
-            self::COLUMN_DESCRIPTION => 3,
-            self::COLUMN_AMOUNT => 4,
+            self::COLUMN_DATE => 0,
+            self::COLUMN_DESCRIPTION => 2,
+            self::COLUMN_AMOUNT => 5,
         ];
         $mapping[self::MAPPING_TYPE_BA] = [		
             self::COLUMN_DATE => 0,
