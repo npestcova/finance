@@ -49,6 +49,18 @@ class NavManager
             ];
 
             $items[] = [
+                'id' => 'charts',
+                'label' => 'Charts',
+                'dropdown' => [
+                    [
+                        'id' => 'chart_flow',
+                        'label' => 'Flow Chart',
+                        'link' => 'chart_flow'
+                    ],
+                ]
+            ];
+
+            $items[] = [
                 'id' => 'budget',
                 'label' => 'Budget',
                 'link'  => 'budget'

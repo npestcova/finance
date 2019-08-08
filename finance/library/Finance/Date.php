@@ -59,4 +59,24 @@ class Date
         return $names;
     }
 
+    /**
+     * @param int $yearsCount
+     * @return array
+     * @throws \Exception
+     */
+    public static function getMonthYearArray($yearsCount)
+    {
+        $monthsCnt = $yearsCount * 12;
+        $date = new \DateTime();
+        $date->setDate($date->format("Y"), $date->format('m'), 1);
+
+        $result = [];
+        for ($i = 0; $i < $monthsCnt; $i++) {
+            $result[$date->format("Y-m")] = $date->format("M, Y");
+            $date->sub(new \DateInterval('P1M'));
+        }
+
+        return $result;
+    }
+
 }

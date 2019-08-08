@@ -67,6 +67,16 @@ return [
                     ],
                 ],
             ],
+            'chart_flow' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/charts/flowchart[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\ChartsController::class,
+                        'action'     => 'flow-chart',
+                    ],
+                ],
+            ],
             'budget' => [
                 'type' => Segment::class,
                 'options' => [
@@ -97,6 +107,7 @@ return [
             Controller\CashflowController::class => Controller\Factory\CashflowControllerFactory::class,
             Controller\BudgetController::class => Controller\Factory\BudgetControllerFactory::class,
             Controller\KeywordController::class => Controller\Factory\KeywordControllerFactory::class,
+            Controller\ChartsController::class => Controller\Factory\ChartsControllerFactory::class,
         ],
     ],
     'service_manager' => [
