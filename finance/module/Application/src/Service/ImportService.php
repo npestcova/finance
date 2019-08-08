@@ -235,11 +235,17 @@ class ImportService extends AbstractService
             self::COLUMN_AMOUNT => 4,		
 		];
         $mapping[self::MAPPING_TYPE_CAPITAL_ONE] = [
-            self::COLUMN_DATE => 2,
-            self::COLUMN_DESCRIPTION => 4,
-            self::COLUMN_DEBIT => 6,
-            self::COLUMN_CREDIT => 7,
+            self::COLUMN_DATE => 0,
+            self::COLUMN_DESCRIPTION => 3,
+            self::COLUMN_DEBIT => 5,
+            self::COLUMN_CREDIT => 6,
 		];
+		//$mapping[self::MAPPING_TYPE_CAPITAL_ONE] = [
+        //    self::COLUMN_DATE => 2,
+        //    self::COLUMN_DESCRIPTION => 4,
+       //     self::COLUMN_DEBIT => 6,
+        //    self::COLUMN_CREDIT => 7,
+		//];
         $mapping[self::MAPPING_TYPE_CAPITAL_ONE_MARKET] = [
             self::COLUMN_DATE => 4,
             self::COLUMN_DESCRIPTION => 3,
