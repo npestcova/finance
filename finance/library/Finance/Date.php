@@ -79,4 +79,23 @@ class Date
         return $result;
     }
 
+    /**
+     * @param $fromDate
+     * @param $toDate
+     * @return array
+     * @throws \Exception
+     */
+    public static function getRangeMonthTitles($fromDate, $toDate): array
+    {
+        $date = new \DateTime($fromDate);
+
+        $result = [];
+        for ($i = 0; $date->format("Y-m-d") <= $toDate; $i++) {
+            $result[$date->format("Y-m")] = $date->format("M, Y");
+            $date->add(new \DateInterval('P1M'));
+        }
+
+        return $result;
+    }
+
 }

@@ -1,5 +1,6 @@
 <?= $this->headScript()
-    ->appendFile($this->basePath('js/library/chart/Chart.min.js'));
+    ->appendFile($this->basePath('js/library/chart/Chart.min.js'))
+    ->appendFile($this->basePath('js/view/charts/FinFlowChart.js'));
 ?>
 
 <div class="jumbotron bg-light pt-0" >
@@ -8,21 +9,21 @@
             <div class="col-sm-2 p-1">
             </div>
             <div class="col-sm-2 p-1">
-                <select class="form-control" id="new_category_id" name="new_category_id">
+                <select class="form-control" id="flow_chart_date_from" name="date_from">
                     <?php foreach ($this->periods as $ym => $name) : ?>
                         <option value="<?= $ym; ?>" <?= $this->fromMonth == $ym ? ' selected' : '';?>><?= $name;?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="col-sm-3 p-1">
-                <select class="form-control" id="new_category_id" name="new_category_id">
+                <select class="form-control" id="flow_chart_category_id" name="category_id">
                     <?php foreach ($this->categories as $categoryId => $categoryName) : ?>
                         <option value="<?= $categoryId; ?>"><?= $categoryName;?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="col-sm-2 p-1">
-                <select class="form-control" id="new_category_id" name="new_category_id">
+                <select class="form-control" id="flow_chart_date_to" name="date_to">
                     <?php foreach ($this->periods as $ym => $name) : ?>
                         <option value="<?= $ym; ?>" <?= $this->toMonth == $ym ? ' selected' : '';?>><?= $name;?></option>
                     <?php endforeach; ?>
@@ -40,6 +41,12 @@
 
 
 <script>
+    FinFlowChart.init   ({
+        url: '/charts/flowchart/get',
+        form:  $('#transaction_form'),
+        canvasId: 'canvas'
+    });
+
     window.randomScalingFactor = function() {
         return Math.round(200) - 100;
     };
@@ -120,22 +127,22 @@
             }
         }
     };
+    //
+    // window.onload = function() {
+    //     var ctx = document.getElementById('canvas').getContext('2d');
+    //     window.myLine = new Chart(ctx, config);
+    // };
 
-    window.onload = function() {
-        var ctx = document.getElementById('canvas').getContext('2d');
-        window.myLine = new Chart(ctx, config);
-    };
-
-    document.getElementById('randomizeData').addEventListener('click', function() {
-        config.data.datasets.forEach(function(dataset) {
-            dataset.data = dataset.data.map(function() {
-                return randomScalingFactor();
-            });
-
-        });
-
-        window.myLine.update();
-    });
+    // document.getElementById('randomizeData').addEventListener('click', function() {
+    //     config.data.datasets.forEach(function(dataset) {
+    //         dataset.data = dataset.data.map(function() {
+    //             return randomScalingFactor();
+    //         });
+    //
+    //     });
+    //
+    //     window.myLine.update();
+    // });
 
     var colorNames = Object.keys(chartColors);
     // document.getElementById('addDataset').addEventListener('click', function() {

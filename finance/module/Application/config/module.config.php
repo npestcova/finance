@@ -72,8 +72,8 @@ return [
                 'options' => [
                     'route'    => '/charts/flowchart[/:action]',
                     'defaults' => [
-                        'controller' => Controller\ChartsController::class,
-                        'action'     => 'flow-chart',
+                        'controller' => Controller\ChartFlowController::class,
+                        'action'     => 'index',
                     ],
                 ],
             ],
@@ -107,7 +107,7 @@ return [
             Controller\CashflowController::class => Controller\Factory\CashflowControllerFactory::class,
             Controller\BudgetController::class => Controller\Factory\BudgetControllerFactory::class,
             Controller\KeywordController::class => Controller\Factory\KeywordControllerFactory::class,
-            Controller\ChartsController::class => Controller\Factory\ChartsControllerFactory::class,
+            Controller\ChartFlowController::class => Controller\Factory\ChartsControllerFactory::class,
         ],
     ],
     'service_manager' => [

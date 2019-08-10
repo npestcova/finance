@@ -72,6 +72,7 @@ return [
              \Application\Service\CategoryService::class => \Application\Service\Factory\AbstractServiceFactory::class,
              \Application\Service\AccountService::class => \Application\Service\Factory\AbstractServiceFactory::class,
              \Application\Service\KeywordService::class => \Application\Service\Factory\AbstractServiceFactory::class,
+             \Application\Service\Charts\FlowService::class => \Application\Service\Charts\Factory\FlowServiceFactory::class,
          ],
      ],
 ];

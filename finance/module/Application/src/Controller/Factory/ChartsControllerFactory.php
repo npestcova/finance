@@ -9,9 +9,8 @@
 namespace Application\Controller\Factory;
 
 
-use Application\Controller\ChartsController;
-use Application\Service\CategoryService;
-use Application\Service\TransactionService;
+use Application\Controller\ChartFlowController;
+use Application\Service\Charts\FlowService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -19,13 +18,11 @@ class ChartsControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $categoryService = $container->get(CategoryService::class);
-        $transactionService = $container->get(TransactionService::class);
+        $flowService = $container->get(FlowService::class);
 
         // Instantiate the controller and inject dependencies
-        return new ChartsController(
-            $transactionService,
-            $categoryService
+        return new ChartFlowController(
+            $flowService
         );
     }
 }
