@@ -28,6 +28,17 @@ class Date
      * @param $date
      * @return string
      */
+    public static function getLastDateOfMonth($date)
+    {
+        $dateObj = new \DateTime($date);
+        $lastDate = $dateObj->format("Y-m-t");
+        return self::getDbDate($lastDate);
+    }
+
+    /**
+     * @param $date
+     * @return string
+     */
     public static function getViewDate($date)
     {
         $dateObj = new \DateTime($date);

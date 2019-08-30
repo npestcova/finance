@@ -27,6 +27,7 @@ var FinFlowChart = {};
             },
             tooltips: {
                 mode: 'index',
+                position: 'nearest',
                 intersect: false,
             },
             hover: {
@@ -92,9 +93,12 @@ var FinFlowChart = {};
                 data: self.getFormData(),
                 dataType: 'json'
             }).done(function(data) {
-                self.setData(data);
-                self.updateChart();
-
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    self.setData(data);
+                    self.updateChart();
+                }
             })
                 .fail(function() {
                     alert( "error" );
@@ -137,6 +141,7 @@ var FinFlowChart = {};
                 fill: false,
                 backgroundColor: this.getBgColor(number),
                 borderColor: this.getBorderColor(number),
+                borderDash: [5, 5],
                 data: []
             };
 
