@@ -16,13 +16,13 @@ use Application\Dto\Transaction\GetMonthlyTotalsDto;
 use Application\Dto\Transaction\MonthlyTotalDto;
 use Application\Dto\Transaction\TransactionSearchDto;
 use Application\Dto\Transaction\TransactionSearchResultDto;
-use Application\Dto\Transaction\ViewInfoDto;
 use Application\Entity\Category;
 use Application\Entity\Transaction;
 use Application\Repository\CategoryRepository;
 use Application\Repository\TransactionRepository;
 use Doctrine\ORM\EntityManager;
 use Finance\Date;
+use Finance\Price;
 
 class TransactionService extends AbstractService
 {
@@ -207,6 +207,38 @@ class TransactionService extends AbstractService
         }
 
         return $result;
+    }
+
+    /**
+     * @param $categoriesIds
+     * @param $dateFrom
+     * @param $dateTo
+     * @return array
+     */
+    public function getCategoryTotalsByDate($categoriesIds, $dateFrom, $dateTo): array
+    {
+        $inputDto = new GetTotalsByCategoryInputDto();
+        $inputDto->startDate = $dateFrom;
+        $inputDto->endDate = $dateTo;
+        $inputDto->categoryIds = $categoriesIds;
+        $inputDto->groupBy = 'date';
+
+        $totals = $this->transactionRepository->findTotalsByCategory($inputDto);
+
+        $categories = [];
+        foreach ($totals as $row) {
+            $categoryId = $row['category_id'];
+            $amount = $row['total'];
+            $date = $row['date'];
+
+            if (!isset( $categories[$categoryId])) {
+                $categories[$categoryId] = [];
+            }
+
+            $categories[$categoryId][$date] = Price::add($categories[$categoryId][$date] ?? 0, $amount);
+        }
+
+        return $categories;
     }
 
     public function getPocketMoneyBalance()

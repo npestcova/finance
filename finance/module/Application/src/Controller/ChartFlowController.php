@@ -48,29 +48,13 @@ class ChartFlowController extends AbstractActionController
     {
         $dateFrom = $this->params()->fromQuery('date_from', '');
         $dateTo = $this->params()->fromQuery('date_to', '');
-        $periods = Date::getRangeMonthTitles($dateFrom . '-01', $dateTo . '-01');
+        $categoryId = (int) $this->params()->fromQuery('category_id', 0);
+
+        $data = $this->flowService->getChartData($dateFrom, $dateTo, $categoryId);
 
         return new JsonModel([
-            'periods' => $periods,
-            'categories' => [
-                [
-                    'name' => 'Name 1',
-                    'totals' => [
-                        '2018-09' => 100,
-                        '2018-10' => 200,
-                        '2018-11' => 100,
-                        '2018-12' => 400,
-                        '2019-01' => 100,
-                        '2019-02' => 200,
-                        '2019-03' => 100,
-                        '2019-04' => 200,
-                        '2019-05' => 100,
-                        '2019-06' => 500,
-                        '2019-07' => 100,
-                        '2019-08' => -100,
-                    ]
-                ]
-            ]
+            'periods' => $data->periods,
+            'categories' => $data->categories
         ]);
     }
 }

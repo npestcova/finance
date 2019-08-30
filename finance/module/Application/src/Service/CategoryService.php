@@ -40,7 +40,7 @@ class CategoryService extends AbstractService
      */
     public function getCategoryNames($includeSubcategories = true, $noFilter = '-- ALL --')
     {
-        $categories = $this->categoryRepository->findBy(['parent' => null], ['name' => 'ASC']);
+        $categories = $this->categoryRepository->findByParent(null, ['name' => 'ASC']);
 
         $result = [
             self::NO_FILTER => $noFilter,
@@ -61,5 +61,24 @@ class CategoryService extends AbstractService
         }
 
         return $result;
+    }
+
+    /**
+     * @param int $categoryId
+     * @return Category[]
+     */
+    public function getSubCategories(int $categoryId): array
+    {
+        $rowset = $this->categoryRepository->findByParent($categoryId, ['name' => 'ASC']);
+        return $rowset;
+    }
+
+    /**
+     * @param int $categoryId
+     * @return Category|null
+     */
+    public function find(int $categoryId): ?Category
+    {
+        return $this->categoryRepository->find($categoryId);
     }
 }

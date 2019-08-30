@@ -22,4 +22,7 @@ class GetTotalsByCategoryInputDto
 
     /** @var string  */
     public $type = '';
+
+    /** @var ?string */
+    public $groupBy;
 }

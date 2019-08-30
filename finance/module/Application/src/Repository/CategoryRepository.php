@@ -25,4 +25,35 @@ class CategoryRepository extends AbstractRepository
         $record = $this->findOneBy(['name' => $name]);
         return $record;
     }
+
+    /**
+     * @param int|null $parentId
+     * @param $orderBy
+     * @return array
+     */
+    public function findByParent(?int $parentId, $orderBy): array
+    {
+        return $this->findBy(['parent' => $parentId], $orderBy);
+    }
+
+    /**
+     * @param int|null $parentId
+     * @return array
+     */
+    public function findIdsByParent(?int $parentId): array
+    {
+        /** @var CategoryQueryBuilder $queryBuilder */
+        $queryBuilder = $this->createQueryBuilder('c')
+            ->select('id');
+
+        if ($parentId === null) {
+            $queryBuilder->where('c.parent is null');
+        } else {
+            $queryBuilder->where('c.parent = :parent')
+                ->setParameter('parent', $parentId);
+        }
+
+        $result = $queryBuilder->getQuery()->getResult();
+        return $result;
+    }
 }

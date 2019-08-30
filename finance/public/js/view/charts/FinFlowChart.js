@@ -16,6 +16,7 @@ var FinFlowChart = {};
             purple: 'rgb(153, 102, 255)',
             grey: 'rgb(201, 203, 207)'
         },
+        labelsInfo: [],
         labels: [],
         dataSets: [],
         chartOptions: {
@@ -110,45 +111,52 @@ var FinFlowChart = {};
         },
 
         setLabels: function(labels) {
+            this.labelsInfo = labels;
             this.labels = [];
+
             var self = this;
-            $.each(labels, function(ym, title) {
+            $.each(labels, function(key, title) {
                 self.labels.push(title);
             });
         },
 
-        setDatasets: function(dataSets) {
-            this.dataSets = [
-                {
-                    label: 'My First dataset',
-                    backgroundColor: this.chartColors.red,
-                    borderColor: this.chartColors.red,
-                    data: [
-                        100,
-                        230.24,
-                        54.56,
-                        -234,
-                        0,
-                        6,
-                        7
-                    ],
-                    fill: false,
-                }, {
-                    label: 'My Second dataset',
-                    fill: false,
-                    backgroundColor: this.chartColors.blue,
-                    borderColor: this.chartColors.blue,
-                    data: [
-                        7,
-                        6,
-                        5,
-                        4,
-                        3,
-                        2,
-                        1
-                    ],
-                }
-            ]
+        setDatasets: function(categories) {
+            this.dataSets = [];
+            var self = this;
+
+            var number = 0;
+            $.each(categories, function(categoryKey, category) {
+                self.dataSets.push(self.parseCategory(number, category));
+                number ++;
+            });
+        },
+
+        parseCategory: function(number, category) {
+            var dataSet = {
+                label: category.name,
+                fill: false,
+                backgroundColor: this.getBgColor(number),
+                borderColor: this.getBorderColor(number),
+                data: []
+            };
+
+            $.each(this.labelsInfo, function(key, title) {
+                var value = key in category.totals ? category.totals[key] : 0;
+                dataSet.data.push(value);
+            });
+
+            return dataSet;
+        },
+
+        getBgColor: function(number) {
+            var colorsMap = ['red', 'blue', 'orange', 'green', 'yellow', 'purple', 'grey'];
+            var colorName = number in colorsMap ? colorsMap[number] : 'grey';
+
+            return this.chartColors[colorName];
+        },
+
+        getBorderColor: function(number) {
+            return this.getBgColor(number);
         },
 
         updateChart: function () {

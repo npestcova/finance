@@ -85,6 +85,7 @@ class TransactionRepository extends AbstractRepository
         $queryBuilder = $this->createQueryBuilder('t')
             ->select('SUM(t.amount) as total')
             ->addSelect('IDENTITY(t.category) as category_id')
+            ->addSelect('t.date')
             ->groupBy('t.category');
 
         $queryBuilder->fromDate($inputDto->startDate)
@@ -99,6 +100,10 @@ class TransactionRepository extends AbstractRepository
             $queryBuilder->leftJoin('t.category', 'c')
                 ->andWhere('c.type = :categoryType')
                 ->setParameter('categoryType', $type);
+        }
+
+        if ($inputDto->groupBy) {
+            $queryBuilder->addGroupBy('t.' . $inputDto->groupBy);
         }
 
         $result = $queryBuilder->getQuery()->getResult();
