@@ -231,7 +231,7 @@ class ImportService extends AbstractService
 		];
         $mapping[self::MAPPING_TYPE_BCU] = [
             self::COLUMN_DATE => 1,
-            self::COLUMN_DESCRIPTION => 6,
+            self::COLUMN_DESCRIPTION => 7,
             self::COLUMN_AMOUNT => 4,		
 		];
         $mapping[self::MAPPING_TYPE_CAPITAL_ONE] = [
