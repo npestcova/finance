@@ -12,7 +12,7 @@ namespace Application\Controller\Factory;
 use Application\Controller\ChartFlowController;
 use Application\Service\Charts\FlowService;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ChartsControllerFactory implements FactoryInterface
 {

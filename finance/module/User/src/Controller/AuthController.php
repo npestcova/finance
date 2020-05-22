@@ -2,11 +2,11 @@
 
 namespace User\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\Authentication\Result;
-use Zend\Uri\Uri;
-use Zend\View\Model\JsonModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Laminas\Authentication\Result;
+use Laminas\Uri\Uri;
+use Laminas\View\Model\JsonModel;
 use User\Entity\User;
 
 /**

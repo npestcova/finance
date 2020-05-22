@@ -90,6 +90,10 @@ class ImportService extends AbstractService
 
         fgetcsv($handle, 1000, ",");     // skip the titles
         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+            if (empty($data)) {
+                continue;
+            }
+            
             $transactionInfo = new TransactionInfoDto();
             $transactionInfo->date = Date::getDbDate((string) $data[$columnDate]);
             $transactionInfo->description = (string) $data[$columnDescription];

@@ -5,7 +5,7 @@ namespace Application\Service\Factory;
 use Application\Service\ImportService;
 use Application\Service\KeywordService;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ImportServiceFactory extends AbstractServiceFactory
     implements FactoryInterface

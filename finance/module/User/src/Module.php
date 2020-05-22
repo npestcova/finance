@@ -7,8 +7,8 @@
 
 namespace User;
 
-use Zend\Mvc\MvcEvent;
-use Zend\Mvc\Controller\AbstractActionController;
+use Laminas\Mvc\MvcEvent;
+use Laminas\Mvc\Controller\AbstractActionController;
 use User\Controller\AuthController;
 use User\Service\AuthManager;
 
@@ -35,7 +35,7 @@ class Module
         $sharedEventManager->attach(AbstractActionController::class, 
                 MvcEvent::EVENT_DISPATCH, [$this, 'onDispatch'], 100);
         
-        $sessionManager = $event->getApplication()->getServiceManager()->get('Zend\Session\SessionManager');
+        $sessionManager = $event->getApplication()->getServiceManager()->get('Laminas\Session\SessionManager');
         
         $this->forgetInvalidSession($sessionManager);
     }

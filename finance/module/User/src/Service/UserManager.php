@@ -2,13 +2,13 @@
 namespace User\Service;
 
 use User\Entity\User;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Math\Rand;
-use Zend\Mail;
-use Zend\Mail\Transport\Smtp as SmtpTransport;
-use Zend\Mail\Transport\SmtpOptions;
-use Zend\Mime\Message as MimeMessage;
-use Zend\Mime\Part as MimePart;
+use Laminas\Crypt\Password\Bcrypt;
+use Laminas\Math\Rand;
+use Laminas\Mail;
+use Laminas\Mail\Transport\Smtp as SmtpTransport;
+use Laminas\Mail\Transport\SmtpOptions;
+use Laminas\Mime\Message as MimeMessage;
+use Laminas\Mime\Part as MimePart;
 
 /**
  * This service is responsible for adding/editing users

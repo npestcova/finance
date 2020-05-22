@@ -13,7 +13,7 @@ use Application\Service\AccountService;
 use Application\Service\CategoryService;
 use Application\Service\TransactionService;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class TransactionControllerFactory implements FactoryInterface
 {

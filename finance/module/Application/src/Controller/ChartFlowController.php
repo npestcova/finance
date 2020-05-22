@@ -12,9 +12,9 @@ namespace Application\Controller;
 use Application\Dto\Charts\Flow\ChartDataDto;
 use Application\Service\Charts\FlowService;
 use Finance\Date;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 class ChartFlowController extends AbstractActionController
 {

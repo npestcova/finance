@@ -11,7 +11,7 @@ namespace Application\Controller\Factory;
 use Application\Controller\ImportController;
 use Application\Service\ImportService;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ImportControllerFactory implements FactoryInterface
 {

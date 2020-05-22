@@ -2,6 +2,8 @@
 namespace Application\Service;
 
 
+use Laminas\Authentication\AuthenticationService;
+
 /**
  * This service is responsible for determining which items should be in the main menu.
  * The items may be different depending on whether the user is authenticated or not.
@@ -10,7 +12,7 @@ class NavManager
 {
     /**
      * Auth service.
-     * @var Zend\Authentication\Authentication
+     * @var AuthenticationService
      */
     private $authService;
     

@@ -12,7 +12,7 @@ use Application\Controller\KeywordController;
 use Application\Service\KeywordService;
 use Application\Service\CategoryService;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class KeywordControllerFactory implements FactoryInterface
 {

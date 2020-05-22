@@ -3,7 +3,7 @@ namespace Application\View\Helper\Factory;
 
 use Application\Service\NavManager;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Application\View\Helper\Menu;
 
 /**

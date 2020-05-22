@@ -5,7 +5,7 @@ namespace Application\Controller\Factory;
 use Application\Controller\BudgetController;
 use Application\Service\TransactionService;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class BudgetControllerFactory implements FactoryInterface
 {
