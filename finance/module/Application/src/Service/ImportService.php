@@ -18,6 +18,7 @@ use Application\Entity\Transaction;
 use Application\Repository\AccountRepository;
 use Application\Repository\CategoryRepository;
 use Finance\Date;
+use Finance\Price;
 
 class ImportService extends AbstractService
 {
@@ -99,7 +100,7 @@ class ImportService extends AbstractService
             $transactionInfo->description = (string) $data[$columnDescription];
 
             if ($columnAmount) {
-                $transactionInfo->amount = (float) $data[$columnAmount];
+                $transactionInfo->amount = Price::fromString((string) $data[$columnAmount]);
             } else {
                 if ((float) $data[$columnDebit] != 0) {
                     $transactionInfo->amount = 0 - (float) $data[$columnDebit];
@@ -133,6 +134,7 @@ class ImportService extends AbstractService
             }
 
             list($mappingType, $accountType, $tmp) = explode('_', $fileName);
+			
             $mapping = $this->getCsvMapping($mappingType);
             if (!$mapping) {
                 echo 'file ' . $fileName . ' mapping not found';
@@ -196,7 +198,7 @@ class ImportService extends AbstractService
      * @param string $description
      * @return Category|null
      */
-    protected function getCategoryByDescription($description)
+    public function getCategoryByDescription($description)
     {
         if (empty($description)) {
             return null;
@@ -235,8 +237,8 @@ class ImportService extends AbstractService
 		];
         $mapping[self::MAPPING_TYPE_BCU] = [
             self::COLUMN_DATE => 1,
-            self::COLUMN_DESCRIPTION => 7,
-            self::COLUMN_AMOUNT => 4,		
+            self::COLUMN_DESCRIPTION => 3,
+            self::COLUMN_AMOUNT => 6,
 		];
         $mapping[self::MAPPING_TYPE_CAPITAL_ONE] = [
             self::COLUMN_DATE => 0,
@@ -290,6 +292,7 @@ class ImportService extends AbstractService
             'saving' => 'Saving',
             'cap' => 'Capital One',
             'money' => 'Capital Money Market',
+            'cd' => 'Capital CD',
             'amazon' => 'Amazon',
             'bcu' => 'BCU-checking',
             'bcu-rainy' => 'BCU-Rainy Day',

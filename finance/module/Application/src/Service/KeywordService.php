@@ -59,8 +59,11 @@ class KeywordService extends AbstractService
      */
     public function getAllKeywords()
     {
-        $keywords = $this->keywordRepository->findAll();
-        return $keywords;
+        $orderBy = [
+            'priority' => 'DESC',
+            'id' => 'DESC',
+        ];
+        return $this->keywordRepository->findBy([], $orderBy);
     }
 
     /**

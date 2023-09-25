@@ -50,6 +50,13 @@ class Keyword extends AbstractEntity
     protected $category;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="priority", type="integer", nullable=false)
+     */
+    protected $priority = 0;
+
+    /**
      * @return ViewInfoDto
      */
     public function getViewInfo()
@@ -90,8 +97,6 @@ class Keyword extends AbstractEntity
         return $this->category;
     }
 
-
-
     /**
      * @param Category $category
      */
@@ -99,6 +104,4 @@ class Keyword extends AbstractEntity
     {
         $this->category = $category;
     }
-
-
 }
