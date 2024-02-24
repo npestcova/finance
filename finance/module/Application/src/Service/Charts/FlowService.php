@@ -96,6 +96,9 @@ class FlowService extends AbstractService
 
         $categoryAverage = $this->initCategoryInfo(current($categories), $periods);
         $categoryAverage->name .= ' (average)';
+		
+		$categoryTotal = $this->initCategoryInfo(current($categories), $periods);
+		$categoryTotal->name .= ' (total)';
 
         $result = [];
         foreach ($totalsByCategory as $categoryId => $totals) {
@@ -106,17 +109,18 @@ class FlowService extends AbstractService
                 $periodKey = $this->findPeriodKey($date, self::PERIOD_TYPE_MONTH);
 
                 $result[$categoryId]->totals[$periodKey] = Price::add($result[$categoryId]->totals[$periodKey], $amount);
-                $categoryAverage->totals[$periodKey] = Price::add($categoryAverage->totals[$periodKey], $amount);
+                $categoryTotal->totals[$periodKey] = Price::add($categoryTotal->totals[$periodKey], $amount);
             }
         }
 
         $categoriesCount = count($result);
         if ($categoriesCount > 0) {
-            foreach ($categoryAverage->totals as $key => $amount) {
+            foreach ($categoryTotal->totals as $key => $amount) {
                 $categoryAverage->totals[$key] = Price::round($amount / $categoriesCount);
             }
         }
         $result[] = $categoryAverage;
+        $result[] = $categoryTotal;
 
         return array_values($result);
     }
