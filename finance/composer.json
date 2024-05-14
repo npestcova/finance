@@ -1,5 +1,5 @@
 {
-    "name": "finance",
+    "name": "buu/finance",
     "description": "my finance",
     "type": "project",
     "license": "BSD-3-Clause",
@@ -10,24 +10,24 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.4",
+        "php": "^8.1",
         "ext-gd": "*",
         "ext-intl": "*",
         "laminas/laminas-component-installer": "*",
-        "laminas/laminas-mvc": "^3.0.1",
-        "laminas/laminas-development-mode": "^3.0",
-        "laminas/laminas-mvc-form": "^1.0",
-        "laminas/laminas-mvc-plugins": "^1.0.1",
-        "laminas/laminas-session": "^2.7.1",
-        "laminas/laminas-authentication": "^2.5",
-        "doctrine/doctrine-orm-module": "^1.1",
-        "doctrine/migrations": "^1.5",
-        "laminas/laminas-math": "^3.0",
-        "laminas/laminas-json": "^3.1",
-        "laminas/laminas-crypt": "^3.1",
-        "laminas/laminas-captcha": "^2.6",
-        "laminas/laminas-mail": "^2.10",
-        "laminas/laminas-mime": "^2.7"
+        "laminas/laminas-mvc": "^3.7.0",
+        "laminas/laminas-development-mode": "*",
+        "laminas/laminas-mvc-form": "*",
+        "laminas/laminas-mvc-plugins": "*",
+        "laminas/laminas-session": "*",
+        "laminas/laminas-authentication": "*",
+        "doctrine/doctrine-orm-module": "*",
+        "doctrine/migrations": "*",
+        "laminas/laminas-math": "*",
+        "laminas/laminas-json": "*",
+        "laminas/laminas-crypt": "*",
+        "laminas/laminas-captcha": "*",
+        "laminas/laminas-mail": "*",
+        "laminas/laminas-mime": "*"
     },
     "autoload": {
         "psr-4": {
@@ -54,5 +54,10 @@
         ],
         "serve": "php -S 0.0.0.0:8080 -t public public/index.php",
         "test": "phpunit"
+    },
+    "config": {
+        "allow-plugins": {
+            "laminas/laminas-component-installer": true
+        }
     }
 }
