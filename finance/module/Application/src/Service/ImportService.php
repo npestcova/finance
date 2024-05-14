@@ -37,6 +37,7 @@ class ImportService extends AbstractService
     const COLUMN_CATEGORY = 'Category';
     const COLUMN_CREDIT = 'Credit';
     const COLUMN_DEBIT = 'Debit';
+    const COLUMN_TYPE = 'Type';
 
     /**
      * @var CategoryRepository
@@ -88,6 +89,7 @@ class ImportService extends AbstractService
         $columnAmount = isset($mapping[self::COLUMN_AMOUNT]) ? $mapping[self::COLUMN_AMOUNT] : null;
         $columnDebit = isset($mapping[self::COLUMN_DEBIT]) ? $mapping[self::COLUMN_DEBIT] : null;
         $columnCredit = isset($mapping[self::COLUMN_CREDIT]) ? $mapping[self::COLUMN_CREDIT] : null;
+        $columnAmountType = isset($mapping[self::COLUMN_TYPE]) ? $mapping[self::COLUMN_TYPE] : null;
 
         fgetcsv($handle, 1000, ",");     // skip the titles
         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
@@ -100,7 +102,11 @@ class ImportService extends AbstractService
             $transactionInfo->description = (string) $data[$columnDescription];
 
             if ($columnAmount) {
-                $transactionInfo->amount = Price::fromString((string) $data[$columnAmount]);
+                $amount = Price::fromString((string) $data[$columnAmount]);
+                if (!empty($columnAmountType) && $data[$columnAmountType] == 'Debit') {
+                    $amount = 0 - $amount;
+                }
+                $transactionInfo->amount = $amount;
             } else {
                 if ((float) $data[$columnDebit] != 0) {
                     $transactionInfo->amount = 0 - (float) $data[$columnDebit];
@@ -255,10 +261,16 @@ class ImportService extends AbstractService
         //    self::COLUMN_CREDIT => 7,
 		//];
         $mapping[self::MAPPING_TYPE_CAPITAL_ONE_MARKET] = [
-            self::COLUMN_DATE => 1,
-            self::COLUMN_DESCRIPTION => 4,
-            self::COLUMN_AMOUNT => 2,
+            self::COLUMN_DATE => 2,
+            self::COLUMN_DESCRIPTION => 1,
+            self::COLUMN_TYPE => 3,
+            self::COLUMN_AMOUNT => 4,
         ];
+//        $mapping[self::MAPPING_TYPE_CAPITAL_ONE_MARKET] = [
+//            self::COLUMN_DATE => 1,
+//            self::COLUMN_DESCRIPTION => 4,
+//            self::COLUMN_AMOUNT => 2,
+//        ];
 //        $mapping[self::MAPPING_TYPE_CAPITAL_ONE_MARKET] = [
 //            self::COLUMN_DATE => 4,
 //            self::COLUMN_DESCRIPTION => 3,
