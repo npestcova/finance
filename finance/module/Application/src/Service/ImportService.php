@@ -121,6 +121,8 @@ class ImportService extends AbstractService
         }
         $this->entityManager->flush();
         fclose($handle);
+
+        unlink($fileName);
     }
 
     public function importCsvFiles($dirName)
