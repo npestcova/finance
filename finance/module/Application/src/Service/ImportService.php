@@ -302,11 +302,12 @@ class ImportService extends AbstractService
     public function getAccountNameByType($type)
     {
         $accountNames = [
-            'checking' => 'Checking Account',
-            'saving' => 'Saving',
+            'checking' => 'Chase Checking',
+            'saving' => 'Chase Saving',
             'cap' => 'Capital One',
             'money' => 'Capital Money Market',
             'cd' => 'Capital CD',
+	    'check' => 'Capital One Checking',
             'amazon' => 'Amazon',
             'bcu' => 'BCU-checking',
             'bcu-rainy' => 'BCU-Rainy Day',
