@@ -104,13 +104,13 @@ nav a.navbar-brand > img {
     }
 
     #transactions th:nth-child(2), #transactions td:nth-child(2) { /* Date */
-        width: 120px;
-        max-width: 120px;
+        width: 160px;
+        max-width: 160px;
     }
 
     #transactions th:nth-child(3), #transactions td:nth-child(3) { /* Account */
-        width: 150px;
-        max-width: 150px;
+        width: 100px;
+        max-width: 100px;
     }
 
     #transactions th:nth-child(4), #transactions td:nth-child(4) { /* Category */
