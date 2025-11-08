@@ -92,9 +92,9 @@ nav a.navbar-brand > img {
 }
 
 /* Large monitor support (1900px+) */
-@media (min-width: 1900px) {
+@media (min-width: 1500px) {
     .container {
-        max-width: 1900px;
+        max-width: 1500px;
     }
 
     /* Transaction table column width adjustments for large screens */
