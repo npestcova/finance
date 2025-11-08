@@ -75,6 +75,12 @@ class TransactionRepository extends AbstractRepository
         $query->execute();
     }
 
+    public function saveTransaction(Transaction $transaction)
+    {
+        $this->_em->persist($transaction);
+        $this->_em->flush();
+    }
+
     /**
      * @param GetTotalsByCategoryInputDto $inputDto
      * @return array

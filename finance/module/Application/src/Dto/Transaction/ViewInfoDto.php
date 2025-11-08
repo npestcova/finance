@@ -26,11 +26,15 @@ class ViewInfoDto
      */
     public $date;
 
+    /** @var int */
+    public $accountId;
     /**
      * @var string
      */
     public $accountName;
 
+    /** @var int */
+    public $categoryId;
     /**
      * @var string
      */

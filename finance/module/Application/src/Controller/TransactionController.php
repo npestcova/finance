@@ -8,6 +8,7 @@
 
 namespace Application\Controller;
 
+use Application\Dto\Transaction\SaveTransactionDto;
 use Application\Dto\Transaction\TransactionSearchDto;
 use Application\Dto\Transaction\BulkChangeTransactionsDto;
 use Application\Service\AccountService;
@@ -94,6 +95,32 @@ class TransactionController extends AbstractActionController
             'action' => 'load',
         ] + $this->params()->fromPost());
 	}
+
+    public function updateAction()
+    {
+        $dto = new SaveTransactionDto();
+        $dto->id = (int) $this->params()->fromPost('id', 0);
+        $dto->description = trim(strip_tags($this->params()->fromPost('description','')));
+        $dto->amount = (float) $this->params()->fromPost('amount', 0);
+        $dto->accountId = (int) $this->params()->fromPost('account_id', 0);
+        $dto->categoryId = (int) $this->params()->fromPost('category_id', 0);
+        $dto->date = Date::getDbDate($this->params()->fromPost('date',''));
+
+        $resultId = $dto->id;
+        try {
+            $resultId = $this->transactionService->updateTransaction($dto);
+        } catch (\Exception $e) {
+            return new JsonModel([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return new JsonModel([
+            'success' => true,
+            'id' => $resultId,
+        ]);
+    }
 
 	public function pocketAction()
     {

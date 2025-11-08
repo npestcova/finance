@@ -14,6 +14,7 @@ use Application\Dto\Transaction\CategoryTotalDto;
 use Application\Dto\Transaction\GetTotalsByCategoryInputDto;
 use Application\Dto\Transaction\GetMonthlyTotalsDto;
 use Application\Dto\Transaction\MonthlyTotalDto;
+use Application\Dto\Transaction\SaveTransactionDto;
 use Application\Dto\Transaction\TransactionSearchDto;
 use Application\Dto\Transaction\TransactionSearchResultDto;
 use Application\Entity\Category;
@@ -99,6 +100,42 @@ class TransactionService extends AbstractService
         $inputDto->categoryId = (int) $inputDto->categoryId;
 
         $this->transactionRepository->bulkChangeTransactions($inputDto);
+    }
+
+    /**
+     * @param SaveTransactionDto $inputDto
+     * @return int
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
+    public function updateTransaction(SaveTransactionDto $inputDto)
+    {
+        if ($inputDto->id) {
+            /** @var Transaction $transaction */
+            $transaction = $this->transactionRepository->find($inputDto->id);
+            if (!$transaction) {
+                throw new \Exception('Transaction not found: ' . $inputDto->id);
+            }
+        } else {
+            $transaction = new Transaction($inputDto);
+        }
+
+        $this->validateSaveTransactionDto($inputDto);
+
+        $transaction->setDate($inputDto->date);
+        $transaction->setAccount($this->entityManager->getReference(
+            \Application\Entity\Account::class,
+            $inputDto->accountId
+        ));
+        $transaction->setCategory($this->entityManager->getReference(
+            \Application\Entity\Category::class,
+            $inputDto->categoryId
+        ));
+        $transaction->setDescription($inputDto->description);
+        $transaction->setAmount($inputDto->amount);
+
+        $this->transactionRepository->saveTransaction($transaction);
+
+        return $transaction->getId();
     }
 
     /**
@@ -305,5 +342,28 @@ class TransactionService extends AbstractService
         }
 
         return $totals;
+    }
+
+    private function validateSaveTransactionDto(SaveTransactionDto $inputDto)
+    {
+        if (!$inputDto->date) {
+            throw new \Exception('Date is required');
+        }
+
+        if (!$inputDto->accountId || $inputDto->accountId <= 0) {
+            throw new \Exception('Account is required');
+        }
+
+        if (!$inputDto->categoryId || $inputDto->categoryId <= 0) {
+            throw new \Exception('Category is required');
+        }
+
+        if (!$inputDto->description) {
+            throw new \Exception('Description is required');
+        }
+
+        if (!is_numeric($inputDto->amount)) {
+            throw new \Exception('Amount is required');
+        }
     }
 }

@@ -76,13 +76,67 @@ class Transaction extends AbstractEntity
         $viewInfo->dateDb = $this->date;
         $viewInfo->date = $this->date; //\Finance\Date::getViewDate($this->date);
         $viewInfo->amount = $this->amount;
+        $viewInfo->accountId = $this->account
+            ? $this->account->getId()
+            : 0;
         $viewInfo->accountName = $this->account
             ? $this->account->getName()
             : Account::DEFAULT_NAME;
+        $viewInfo->categoryId = $this->category
+            ? $this->category->getId()
+            : 0;
         $viewInfo->categoryName = $this->category
             ? $this->category->getFullName()
             : Category::DEFAULT_NAME;
 
         return $viewInfo;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return (int) $this->id;
+    }
+
+    /**
+     * @param string $date
+     */
+    public function setDate($date)
+    {
+        $this->date = $date;
+    }
+
+    /**
+     * @param Account $account
+     */
+    public function setAccount(Account $account)
+    {
+        $this->account = $account;
+    }
+
+    /**
+     * @param Category $category
+     */
+    public function setCategory(Category $category)
+    {
+        $this->category = $category;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @param float $amount
+     */
+    public function setAmount($amount)
+    {
+        $this->amount = $amount;
     }
 }
