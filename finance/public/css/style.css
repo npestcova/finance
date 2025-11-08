@@ -104,8 +104,8 @@ nav a.navbar-brand > img {
     }
 
     #transactions th:nth-child(2), #transactions td:nth-child(2) { /* Date */
-        width: 130px;
-        max-width: 130px;
+        width: 100px;
+        max-width: 100px;
     }
 
     #transactions th:nth-child(3), #transactions td:nth-child(3) { /* Account */
