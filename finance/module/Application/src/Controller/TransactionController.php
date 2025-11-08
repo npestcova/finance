@@ -102,8 +102,10 @@ class TransactionController extends AbstractActionController
         $dto->id = (int) $this->params()->fromPost('id', 0);
         $dto->description = trim(strip_tags($this->params()->fromPost('description','')));
         $dto->amount = (float) $this->params()->fromPost('amount', 0);
-        $dto->accountId = (int) $this->params()->fromPost('account_id', 0);
-        $dto->categoryId = (int) $this->params()->fromPost('category_id', 0);
+        $accountId = $this->params()->fromPost('account_id', null);
+        $dto->accountId = $accountId != null ? (int) $accountId : null;
+        $categoryId = $this->params()->fromPost('category_id', null);
+        $dto->categoryId = $categoryId != null ? (int) $categoryId : null;
         $dto->date = Date::getDbDate($this->params()->fromPost('date',''));
 
         $resultId = $dto->id;

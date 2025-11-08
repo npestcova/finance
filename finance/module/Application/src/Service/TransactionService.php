@@ -122,17 +122,22 @@ class TransactionService extends AbstractService
         $this->validateSaveTransactionDto($inputDto);
 
         $transaction->setDate($inputDto->date);
-        $transaction->setAccount($this->entityManager->getReference(
-            \Application\Entity\Account::class,
-            $inputDto->accountId
-        ));
-        $transaction->setCategory($this->entityManager->getReference(
-            \Application\Entity\Category::class,
-            $inputDto->categoryId
-        ));
         $transaction->setDescription($inputDto->description);
         $transaction->setAmount($inputDto->amount);
 
+        if (!empty($inputDto->accountId)) {
+            $transaction->setAccount($this->entityManager->getReference(
+                \Application\Entity\Account::class,
+                $inputDto->accountId
+            ));
+        }
+
+        if (!empty($inputDto->categoryId)) {
+            $transaction->setCategory($this->entityManager->getReference(
+                \Application\Entity\Category::class,
+                $inputDto->categoryId
+            ));
+        }
         $this->transactionRepository->saveTransaction($transaction);
 
         return $transaction->getId();
@@ -348,14 +353,6 @@ class TransactionService extends AbstractService
     {
         if (!$inputDto->date) {
             throw new \Exception('Date is required');
-        }
-
-        if (!$inputDto->accountId || $inputDto->accountId <= 0) {
-            throw new \Exception('Account is required');
-        }
-
-        if (!$inputDto->categoryId || $inputDto->categoryId <= 0) {
-            throw new \Exception('Category is required');
         }
 
         if (!$inputDto->description) {

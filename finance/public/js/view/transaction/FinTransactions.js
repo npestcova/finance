@@ -1,4 +1,27 @@
 jQuery.widget ("custom.FinTransactions", {
+    // Constants for better maintainability
+    COLUMN_INDICES: {
+        ID: 0,
+        DATE: 1,
+        ACCOUNT: 2,
+        CATEGORY: 3,
+        DESCRIPTION: 4,
+        AMOUNT: 5
+    },
+
+    CSS_CLASSES: {
+        EDIT_DATE: 'edit-date',
+        EDIT_DESCRIPTION: 'edit-description',
+        EDIT_AMOUNT: 'edit-amount',
+        SPLIT_BUTTON: 'btn-split-transaction',
+        SAVING: 'edit-saving',
+        SUCCESS: 'edit-success',
+        ERROR: 'edit-error'
+    },
+
+    AJAX_TIMEOUT: 10000,
+    SUCCESS_HIGHLIGHT_DURATION: 2000,
+
     options: {
         url: '',
 		    saveUrl: '',
@@ -65,6 +88,16 @@ jQuery.widget ("custom.FinTransactions", {
         var self = this;
         if (this._inlineSaveBound) { return; }
         this._inlineSaveBound = true;
+        // Split transaction button handler
+        this.options.table.on('click', '.btn-split-transaction', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var $button = $(this);
+            var $amountInput = $button.siblings('.edit-amount');
+            var currentAmount = $amountInput.val() || '0';
+            self._showSplitModal(currentAmount, $amountInput);
+        });
+
         this.options.table.on('blur', '.edit-date, .edit-description, .edit-amount', function() {
             var $input = $(this);
             var original = $input.data('original');
@@ -89,7 +122,7 @@ jQuery.widget ("custom.FinTransactions", {
             }
 
             // Validate and normalize amount field
-            if ($input.hasClass('edit-amount')) {
+            if ($input.hasClass(self.CSS_CLASSES.EDIT_AMOUNT)) {
                 var numValue = parseFloat(data.amount);
                 if (data.amount !== '' && !isNaN(numValue)) {
                     data.amount = numValue.toFixed(2);
@@ -105,33 +138,18 @@ jQuery.widget ("custom.FinTransactions", {
 
             self._markSaving($input);
 
-            $.ajax({
-                url: self.options.updateOneUrl,
-                method: 'POST',
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                timeout: 10000 // 10 second timeout
-            }).done(function(resp) {
-                if (resp && resp.success === true) {
-                    // Update original value only for the changed input
+            self._makeAjaxRequest(data,
+                function(resp) {
+                    // Success callback
                     $input.data('original', $input.val());
                     self._markSuccess($input);
-                } else {
-                    var message = (resp && resp.error) ? resp.error : 'Error saving value';
+                },
+                function(message, isNetworkError) {
+                    // Error callback
                     self._markError($input);
                     alert(message);
                 }
-            }).fail(function(xhr, status, error) {
-                self._markError($input);
-                var message = 'Network error saving value';
-                if (status === 'timeout') {
-                    message = 'Request timed out. Please try again.';
-                } else if (xhr.status) {
-                    message = 'Server error (' + xhr.status + '). Please try again.';
-                }
-                alert(message);
-            });
+            );
         });
     },
 
@@ -143,19 +161,23 @@ jQuery.widget ("custom.FinTransactions", {
         if (!id) { return null; }
 
         // Get values from inputs, fallback to cell text if input doesn't exist
-        var dateInput = $row.find('.edit-date');
-        var descInput = $row.find('.edit-description');
-        var amountInput = $row.find('.edit-amount');
+        var dateInput = $row.find('.' + this.CSS_CLASSES.EDIT_DATE);
+        var descInput = $row.find('.' + this.CSS_CLASSES.EDIT_DESCRIPTION);
+        var amountInput = $row.find('.' + this.CSS_CLASSES.EDIT_AMOUNT);
 
-        var dateVal = dateInput.length ? dateInput.val().trim() : $row.find('td').eq(1).text().trim();
-        var descVal = descInput.length ? descInput.val().trim() : $row.find('td').eq(4).text().trim();
-        var amountVal = amountInput.length ? amountInput.val().trim() : $row.find('td').eq(5).text().trim();
+        var dateVal = dateInput.length ? dateInput.val().trim() : this._getCellValue($row, this.COLUMN_INDICES.DATE);
+        var descVal = descInput.length ? descInput.val().trim() : this._getCellValue($row, this.COLUMN_INDICES.DESCRIPTION);
+        var amountVal = amountInput.length ? amountInput.val().trim() : this._getCellValue($row, this.COLUMN_INDICES.AMOUNT);
 
         return {
             id: id,
             date: dateVal || '',
             description: descVal || '',
-            amount: amountVal || ''
+            amount: amountVal || '',
+            accountId: $row.attr('data-account-id') || '',
+            categoryId: $row.attr('data-category-id') || '',
+            accountName: this._getCellValue($row, this.COLUMN_INDICES.ACCOUNT),
+            categoryName: this._getCellValue($row, this.COLUMN_INDICES.CATEGORY)
         };
     },
 
@@ -225,9 +247,9 @@ jQuery.widget ("custom.FinTransactions", {
                 row.description,
                 row.amount
             ]);
-            // Tag the last inserted DOM row with its transaction id for later lookup
+
             var $lastRow = this.options.table.find('tbody tr').last();
-            $lastRow.attr('data-row-id', row.id);
+            this._setRowDataAttributes($lastRow, row.id, row.accountId, row.categoryId);
         }
     },
 
@@ -253,42 +275,27 @@ jQuery.widget ("custom.FinTransactions", {
         var escaped = raw.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         var inputType = type || 'text';
         var stepAttr = (type === 'number') ? ' step="0.01"' : '';
-        return '<input name="' + className + '" type="' + inputType + '" class="' + className + '" value="' + escaped + '" data-original="' + escaped + '"' + stepAttr + '>';
+        var input = '<input name="' + className + '" type="' + inputType + '" class="' + className + '" value="' + escaped + '" data-original="' + escaped + '"' + stepAttr + '>';
+
+        // Add split button for amount inputs
+        if (className === this.CSS_CLASSES.EDIT_AMOUNT) {
+            input += '<button type="button" class="' + this.CSS_CLASSES.SPLIT_BUTTON + '" title="Split Transaction">//' + '</button>';
+        }
+
+        return input;
     },
 
     switchToEditMode: function() {
-        if (this.options.editMode) { return; } // already in edit mode
+        if (this.options.editMode) { return; }
         this.options.editMode = true;
 
         var rows = this.options.dataTable.rows({ 'search': 'applied' }).nodes();
         var self = this;
 
         $(rows).each(function(index, row) {
-            var $row = $(row);
-            var cells = $row.find('td');
-
-            // Date (index 1)
-            var dateCell = $(cells[1]);
-            if (!dateCell.find('input').length) {
-                var dateValue = dateCell.text();
-                // Use type=date if value looks like YYYY-MM-DD
-                var dateType = /^\d{4}-\d{2}-\d{2}$/.test(dateValue) ? 'date' : 'text';
-                dateCell.html(self._buildInput('edit-date', dateValue, dateType));
-            }
-
-            // Description (index 4)
-            var descCell = $(cells[4]);
-            if (!descCell.find('input').length) {
-                var descValue = descCell.text();
-                descCell.html(self._buildInput('edit-description', descValue, 'text'));
-            }
-
-            // Amount (index 5)
-            var amountCell = $(cells[5]);
-            if (!amountCell.find('input').length) {
-                var amountValue = amountCell.text();
-                amountCell.html(self._buildInput('edit-amount', amountValue, 'number'));
-            }
+            self._convertCellToEditMode($(row), self.COLUMN_INDICES.DATE, self.CSS_CLASSES.EDIT_DATE, 'date');
+            self._convertCellToEditMode($(row), self.COLUMN_INDICES.DESCRIPTION, self.CSS_CLASSES.EDIT_DESCRIPTION, 'text');
+            self._convertCellToEditMode($(row), self.COLUMN_INDICES.AMOUNT, self.CSS_CLASSES.EDIT_AMOUNT, 'number');
         });
     },
 
@@ -297,29 +304,36 @@ jQuery.widget ("custom.FinTransactions", {
         this.options.editMode = false;
 
         var rows = this.options.dataTable.rows({ 'search': 'applied' }).nodes();
+        var self = this;
 
         $(rows).each(function(index, row) {
-            var $row = $(row);
-            var cells = $row.find('td');
-
-            var dateCell = $(cells[1]);
-            var dateInput = dateCell.find('.edit-date');
-            if (dateInput.length) {
-                dateCell.text(dateInput.val());
-            }
-
-            var descCell = $(cells[4]);
-            var descInput = descCell.find('.edit-description');
-            if (descInput.length) {
-                descCell.text(descInput.val());
-            }
-
-            var amountCell = $(cells[5]);
-            var amountInput = amountCell.find('.edit-amount');
-            if (amountInput.length) {
-                amountCell.text(amountInput.val());
-            }
+            self._convertCellToViewMode($(row), self.COLUMN_INDICES.DATE, self.CSS_CLASSES.EDIT_DATE);
+            self._convertCellToViewMode($(row), self.COLUMN_INDICES.DESCRIPTION, self.CSS_CLASSES.EDIT_DESCRIPTION);
+            self._convertCellToViewMode($(row), self.COLUMN_INDICES.AMOUNT, self.CSS_CLASSES.EDIT_AMOUNT);
         });
+    },
+
+    // Helper: Convert cell to edit mode
+    _convertCellToEditMode: function($row, columnIndex, cssClass, inputType) {
+        var cell = $row.find('td').eq(columnIndex);
+        if (!cell.find('input').length) {
+            var value = cell.text();
+            // Use appropriate input type based on content
+            var actualType = inputType;
+            if (inputType === 'date' && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                actualType = 'text';
+            }
+            cell.html(this._buildInput(cssClass, value, actualType));
+        }
+    },
+
+    // Helper: Convert cell to view mode
+    _convertCellToViewMode: function($row, columnIndex, cssClass) {
+        var cell = $row.find('td').eq(columnIndex);
+        var input = cell.find('.' + cssClass);
+        if (input.length) {
+            cell.text(input.val());
+        }
     },
 
 	updateTotal: function(total) {
@@ -331,14 +345,277 @@ jQuery.widget ("custom.FinTransactions", {
     },
 
     _markSaving: function($input) {
-        $input.removeClass('edit-success edit-error').addClass('edit-saving');
+        $input.removeClass(this.CSS_CLASSES.SUCCESS + ' ' + this.CSS_CLASSES.ERROR).addClass(this.CSS_CLASSES.SAVING);
     },
     _markSuccess: function($input) {
-        $input.removeClass('edit-error edit-saving').addClass('edit-success');
-        // Optionally remove success highlight after a short delay
-        setTimeout(function(){ $input.removeClass('edit-success'); }, 2000);
+        var self = this;
+        $input.removeClass(this.CSS_CLASSES.ERROR + ' ' + this.CSS_CLASSES.SAVING).addClass(this.CSS_CLASSES.SUCCESS);
+        // Remove success highlight after configured delay
+        setTimeout(function(){
+            $input.removeClass(self.CSS_CLASSES.SUCCESS);
+        }, this.SUCCESS_HIGHLIGHT_DURATION);
     },
     _markError: function($input) {
-        $input.removeClass('edit-success edit-saving').addClass('edit-error');
+        $input.removeClass(this.CSS_CLASSES.SUCCESS + ' ' + this.CSS_CLASSES.SAVING).addClass(this.CSS_CLASSES.ERROR);
+    },
+
+    // Helper: Create standardized AJAX request
+    _makeAjaxRequest: function(data, successCallback, errorCallback) {
+        var self = this;
+        return $.ajax({
+            url: self.options.updateOneUrl,
+            method: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            timeout: self.AJAX_TIMEOUT
+        }).done(function(resp) {
+            if (resp && resp.success === true) {
+                if (successCallback) successCallback(resp);
+            } else {
+                var message = (resp && resp.error) ? resp.error : 'Operation failed';
+                if (errorCallback) errorCallback(message, false);
+            }
+        }).fail(function(xhr, status, error) {
+            var message = self._getAjaxErrorMessage(status, xhr.status);
+            if (errorCallback) errorCallback(message, true);
+        });
+    },
+
+    // Helper: Get standardized AJAX error message
+    _getAjaxErrorMessage: function(status, httpStatus) {
+        if (status === 'timeout') {
+            return 'Request timed out. Please try again.';
+        } else if (httpStatus) {
+            return 'Server error (' + httpStatus + '). Please try again.';
+        }
+        return 'Network error. Please try again.';
+    },
+
+    // Helper: Get cell value by column index
+    _getCellValue: function($row, columnIndex) {
+        return $row.find('td').eq(columnIndex).text().trim();
+    },
+
+    // Helper: Set row data attributes
+    _setRowDataAttributes: function($row, id, accountId, categoryId) {
+        $row.attr({
+            'data-row-id': id,
+            'data-account-id': accountId || '',
+            'data-category-id': categoryId || ''
+        });
+    },
+
+    // Show split transaction modal
+    _showSplitModal: function(currentAmount, $amountInput) {
+        var self = this;
+
+        // Create modal if it doesn't exist
+        if (!$('#splitTransactionModal').length) {
+            self._createSplitModal();
+        }
+
+        var originalAmount = parseFloat(currentAmount) || 0;
+
+        // Set initial values
+        $('#split_amount_1').val(currentAmount);
+        $('#split_amount_2').val('0');
+
+        // Store references
+        $('#splitTransactionModal').data('original-input', $amountInput);
+        $('#splitTransactionModal').data('original-amount', originalAmount);
+
+        // Update total display
+        self._updateSplitTotal();
+
+        // Show modal
+        $('#splitTransactionModal').modal('show');
+
+        // Focus first input
+        setTimeout(function() {
+            $('#split_amount_1').focus().select();
+        }, 300);
+    },
+
+    // Create split transaction modal
+    _createSplitModal: function() {
+        var modalHtml = '<div class="modal fade" id="splitTransactionModal" tabindex="-1" role="dialog">' +
+            '<div class="modal-dialog" role="document">' +
+            '<div class="modal-content">' +
+            '<div class="modal-header">' +
+            '<h5 class="modal-title">Split Transaction</h5>' +
+            '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+            '<span aria-hidden="true">&times;</span>' +
+            '</button>' +
+            '</div>' +
+            '<div class="modal-body">' +
+            '<div class="form-group">' +
+            '<label for="split_amount_1">Amount 1:</label>' +
+            '<input type="number" class="form-control" id="split_amount_1" step="0.01">' +
+            '</div>' +
+            '<div class="form-group">' +
+            '<label for="split_amount_2">Amount 2:</label>' +
+            '<input type="number" class="form-control" id="split_amount_2" step="0.01">' +
+            '</div>' +
+            '<div class="form-group">' +
+            '<small class="text-muted">Total: <span id="split_total">0.00</span></small>' +
+            '</div>' +
+            '</div>' +
+            '<div class="modal-footer">' +
+            '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>' +
+            '<button type="button" class="btn btn-primary" id="btn-apply-split">Apply Split</button>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+
+        $('body').append(modalHtml);
+
+        var self = this;
+
+        // When amount 1 changes, calculate remaining balance for amount 2
+        $('#split_amount_1').on('input', function() {
+            self._updateRemainingBalance();
+        });
+
+        // Update total display when amount 2 changes
+        $('#split_amount_2').on('input', function() {
+            self._updateSplitTotal();
+        });
+
+        // Apply split button handler
+        $('#btn-apply-split').on('click', function() {
+            self._applySplit();
+        });
+    },
+
+    // Update remaining balance in amount 2 when amount 1 changes
+    _updateRemainingBalance: function() {
+        var originalAmount = parseFloat($('#splitTransactionModal').data('original-amount')) || 0;
+        var amount1 = parseFloat($('#split_amount_1').val()) || 0;
+        var remaining = originalAmount - amount1;
+        $('#split_amount_2').val(remaining.toFixed(2));
+        this._updateSplitTotal();
+    },
+
+    // Update split total display
+    _updateSplitTotal: function() {
+        var amount1 = parseFloat($('#split_amount_1').val()) || 0;
+        var amount2 = parseFloat($('#split_amount_2').val()) || 0;
+        var total = amount1 + amount2;
+        $('#split_total').text(total.toFixed(2));
+    },
+
+    // Apply the split - update existing row and create new row
+    _applySplit: function() {
+        var self = this;
+        var $originalInput = $('#splitTransactionModal').data('original-input');
+        var amount1 = parseFloat($('#split_amount_1').val()) || 0;
+        var amount2 = parseFloat($('#split_amount_2').val()) || 0;
+
+        if (!$originalInput || !$originalInput.length || amount2 === 0) {
+            $('#splitTransactionModal').modal('hide');
+            return;
+        }
+
+        var $originalRow = $originalInput.closest('tr');
+        var originalData = self._collectRowEditData($originalRow);
+
+        // Step 1: Update the existing row with amount1
+        $originalInput.val(amount1.toFixed(2));
+        self._markSaving($originalInput);
+
+        // Update existing transaction
+        var updateData = {
+            id: originalData.id,
+            date: originalData.date,
+            description: originalData.description,
+            amount: amount1.toFixed(2)
+        };
+
+        self._makeAjaxRequest(updateData,
+            function(resp) {
+                // Success callback
+                $originalInput.data('original', amount1.toFixed(2));
+                self._markSuccess($originalInput);
+
+                // Step 2: Create new transaction with amount2
+                self._createSplitTransaction(originalData, amount2, $originalRow);
+            },
+            function(message, isNetworkError) {
+                // Error callback
+                self._markError($originalInput);
+                alert(message);
+            }
+        );
+
+        $('#splitTransactionModal').modal('hide');
+    },
+
+    // Create new split transaction
+    _createSplitTransaction: function(originalData, amount2, $originalRow) {
+        var self = this;
+
+        // Prepare new transaction data for creation (no ID since it's new)
+        var newTransactionData = {
+            date: originalData.date,
+            description: originalData.description,
+            amount: amount2.toFixed(2),
+            account_id: originalData.accountId,
+            category_id: originalData.categoryId
+        };
+
+        self._makeAjaxRequest(newTransactionData,
+            function(resp) {
+                // Success callback - create new row
+                if (resp.id) {
+                    self._addNewSplitRow(resp, originalData, amount2, $originalRow);
+                    console.log('Split transaction created successfully with ID:', resp.id);
+                } else {
+                    alert('Error creating split transaction - no ID returned');
+                }
+            },
+            function(message, isNetworkError) {
+                // Error callback
+                alert(message);
+            }
+        );
+    },
+
+    // Helper: Add new split row to table
+    _addNewSplitRow: function(resp, originalData, amount2, $originalRow) {
+        var self = this;
+
+        // Create new row data array
+        var newRowData = [
+            resp.id,
+            originalData.date,
+            originalData.accountName,
+            originalData.categoryName,
+            originalData.description,
+            amount2.toFixed(2)
+        ];
+
+        // Add row to DataTable
+        var newRow = self.options.dataTable.row.add(newRowData);
+        var $newRowNode = $(newRow.node());
+
+        // Set data attributes using helper method
+        self._setRowDataAttributes($newRowNode, resp.id, originalData.accountId, originalData.categoryId);
+
+        // Redraw and position the new row
+        self.options.dataTable.draw(false);
+        self._positionSplitRow(resp.id, originalData.id);
+    },
+
+    // Helper: Position split row after original row
+    _positionSplitRow: function(newRowId, originalRowId) {
+        var $allRows = this.options.table.find('tbody tr');
+        var $newRow = $allRows.filter('[data-row-id="' + newRowId + '"]');
+        var $originalRow = $allRows.filter('[data-row-id="' + originalRowId + '"]');
+
+        if ($newRow.length && $originalRow.length) {
+            $newRow.detach().insertAfter($originalRow);
+        }
     }
 });

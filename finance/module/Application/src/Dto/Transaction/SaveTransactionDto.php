@@ -15,12 +15,12 @@ class SaveTransactionDto
     public $date;
 
     /**
-     * @var integer
+     * @var integer|null
      */
     public $accountId;
 
     /**
-     * @var integer
+     * @var integer|null
      */
     public $categoryId;
 
