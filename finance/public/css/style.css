@@ -91,10 +91,10 @@ nav a.navbar-brand > img {
     background: #dee2e6;
 }
 
-/* Large monitor support (1900px+) */
-@media (min-width: 1500px) {
+/* Large monitor support (1400px+) */
+@media (min-width: 1400px) {
     .container {
-        max-width: 1500px;
+        max-width: 1600px;
     }
 
     /* Transaction table column width adjustments for large screens */
@@ -135,18 +135,15 @@ nav a.navbar-brand > img {
         table-layout: fixed;
     }
 
-    /* Adjust input widths in edit mode for large screens */
-    .edit-date {
-        width: 100px;
-    }
+    /* Keep inputs full width in edit mode for better UX */
+    @media (min-width: 1400px) {
+        .edit-amount {
+            text-align: right;
+        }
 
-    .edit-amount {
-        width: 100px;
-        text-align: right;
-    }
-
-    .edit-description {
-        width: calc(100% - 30px); /* Account for split button */
+        .edit-description {
+            width: calc(100% - 30px); /* Account for split button */
+        }
     }
 }
 
