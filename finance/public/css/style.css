@@ -37,3 +37,25 @@ nav a.navbar-brand > img {
 .bg-secondary {
     background-color: #67c249 !important;
 }
+
+/* Transaction table edit mode styles */
+.edit-date, .edit-description, .edit-amount {
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 2px 4px;
+    box-sizing: border-box;
+    background-color: #fff;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.edit-date:focus, .edit-description:focus, .edit-amount:focus {
+    border-color: #007cba;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 124, 186, 0.3);
+}
+
+/* Add state borders for inline editing */
+.edit-saving { border-color: #b38f00 !important; }
+.edit-success { border-color: #2e7d32 !important; }
+.edit-error { border-color: #c62828 !important; }

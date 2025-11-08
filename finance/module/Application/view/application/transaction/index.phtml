@@ -53,7 +53,10 @@
 			<div class="col-sm-2 p-1">
 				<button id="apply" type="button" class="btn btn-outline-light" onclick="applyChanges()">Apply</button>
 			</div>
-			
+			<div class="col-sm-2 p-1">
+				<button id="toggle_edit_mode" type="button" class="btn btn-outline-light" onclick="toggleEditMode()">Edit Mode</button>
+			</div>
+
 		</div>
 		<table id="transactions" class="display" width="100%"></table>
         <div class="col-sm-4">
@@ -65,11 +68,25 @@
 <script>
     var transactionsTable =  $('#transactions');
 
+    var isEditMode = false;
+
     doTableReload = function() {
         transactionsTable.FinTransactions('reload');
     };
     applyChanges = function() {
         transactionsTable.FinTransactions('applyChanges');
+    };
+    toggleEditMode = function() {
+        var button = $('#toggle_edit_mode');
+        if (isEditMode) {
+            transactionsTable.FinTransactions('switchToViewMode');
+            button.text('Edit Mode');
+            isEditMode = false;
+        } else {
+            transactionsTable.FinTransactions('switchToEditMode');
+            button.text('View Mode');
+            isEditMode = true;
+        }
     };
 
     $(document).ready(function() {
@@ -80,6 +97,7 @@
         transactionsTable.FinTransactions({
             url: '/transaction/load',
             saveUrl: '/transaction/save',
+            updateOneUrl: '/transaction/update',
             table: transactionsTable,
             filterForm: $('#filter_form'),
 			form: $('#transaction_form'),
