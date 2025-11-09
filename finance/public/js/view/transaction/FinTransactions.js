@@ -561,8 +561,8 @@ jQuery.widget ("custom.FinTransactions", {
             date: originalData.date,
             description: originalData.description,
             amount: amount2.toFixed(2),
-            account_id: originalData.accountId,
-            category_id: originalData.categoryId
+            accountId: originalData.accountId,
+            categoryId: originalData.categoryId
         };
 
         self._makeAjaxRequest(newTransactionData,

@@ -98,15 +98,32 @@ class TransactionController extends AbstractActionController
 
     public function updateAction()
     {
+        // Get JSON input from request body
+        $jsonInput = file_get_contents('php://input');
+        $inputData = json_decode($jsonInput, true);
+
+        // Validate JSON input
+        if (!$inputData) {
+            return new JsonModel([
+                'success' => false,
+                'error' => 'Invalid JSON input',
+            ]);
+        }
+
         $dto = new SaveTransactionDto();
-        $dto->id = (int) $this->params()->fromPost('id', 0);
-        $dto->description = trim(strip_tags($this->params()->fromPost('description','')));
-        $dto->amount = (float) $this->params()->fromPost('amount', 0);
-        $accountId = $this->params()->fromPost('account_id', null);
-        $dto->accountId = $accountId != null ? (int) $accountId : null;
-        $categoryId = $this->params()->fromPost('category_id', null);
-        $dto->categoryId = $categoryId != null ? (int) $categoryId : null;
-        $dto->date = Date::getDbDate($this->params()->fromPost('date',''));
+        $dto->id = isset($inputData['id']) ? (int) $inputData['id'] : 0;
+        $dto->description = isset($inputData['description']) ? trim(strip_tags($inputData['description'])) : '';
+        $dto->amount = isset($inputData['amount']) ? (float) $inputData['amount'] : 0;
+
+        // Handle accountId - can be empty string, null, or numeric
+        $accountId = $inputData['accountId'] ?? null;
+        $dto->accountId = ($accountId !== null && $accountId !== '') ? (int) $accountId : null;
+
+        // Handle categoryId - can be empty string, null, or numeric
+        $categoryId = $inputData['categoryId'] ?? null;
+        $dto->categoryId = ($categoryId !== null && $categoryId !== '') ? (int) $categoryId : null;
+
+        $dto->date = isset($inputData['date']) ? Date::getDbDate($inputData['date']) : '';
 
         $resultId = $dto->id;
         try {
