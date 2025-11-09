@@ -21,10 +21,12 @@ jQuery.widget ("custom.FinTransactions", {
 
     AJAX_TIMEOUT: 10000,
     SUCCESS_HIGHLIGHT_DURATION: 2000,
+    MODAL_FOCUS_DELAY: 300,
+    DEFAULT_AMOUNT: '0',
 
     options: {
         url: '',
-		    saveUrl: '',
+        saveUrl: '',
         updateOneUrl: '',
         table: null,
         dataTable: null,
@@ -34,16 +36,16 @@ jQuery.widget ("custom.FinTransactions", {
         editMode: false, // track whether grid is currently in edit mode
         columns: [
             { 
-				title: '<input type="checkbox" class="editor-active" id="select_all_transactions" value="1"/>',
-				render: function ( data, type, row ) {
+                title: '<input type="checkbox" class="editor-active" id="select_all_transactions" value="1"/>',
+                render: function ( data, type, row ) {
                     if ( type === 'display' ) {
                         return '<input type="checkbox" class="editor-active" name="id[' + data + ']" value="1">';
                     }
                     return data;
                 },
-				searchable: false,
-				orderable: false
-			},
+                searchable: false,
+                orderable: false
+            },
             { title: "Date" },
             { title: "Account" },
             { title: "Category" },
@@ -60,27 +62,36 @@ jQuery.widget ("custom.FinTransactions", {
         // this.options.form = params.form;
 
         this.initDataTable();
-		    this.bindEvents();
+            this.bindEvents();
         this._initInlineEditSaving(); // new extraction for inline edit save logic
         this.reload();
     },
 
     initDataTable: function() {
+        var self = this;
         this.options.dataTable = this.options.table.DataTable( {
             data: [],
             columns: this.options.columns
         } );
         this.options.dataTableObj = this.options.table.dataTable();
+
+        // Store transaction data for attribute restoration
+        this._transactionData = {};
+
+        // Hook into draw event to restore row attributes after search/filter
+        this.options.dataTable.on('draw.dt', function() {
+            self._restoreRowAttributes();
+        });
     },
 
-	bindEvents: function() {
-		var self = this;
-		
-		$('#select_all_transactions').on('click', function() {
-		  
-		  var rows = self.options.dataTable.rows({ 'search': 'applied' }).nodes();		  
-		  $('input[type="checkbox"]', rows).prop('checked', this.checked);
-	   });
+    bindEvents: function() {
+        var self = this;
+        
+        $('#select_all_transactions').on('click', function() {
+          
+          var rows = self.options.dataTable.rows({ 'search': 'applied' }).nodes();          
+          $('input[type="checkbox"]', rows).prop('checked', this.checked);
+       });
     },
 
     // New: initialize blur saving handler separately
@@ -123,16 +134,8 @@ jQuery.widget ("custom.FinTransactions", {
 
             // Validate and normalize amount field
             if ($input.hasClass(self.CSS_CLASSES.EDIT_AMOUNT)) {
-                var numValue = parseFloat(data.amount);
-                if (data.amount !== '' && !isNaN(numValue)) {
-                    data.amount = numValue.toFixed(2);
-                    $input.val(data.amount);
-                } else if (data.amount !== '') {
-                    // Invalid amount - revert to original and show error
-                    $input.val(original);
-                    self._markError($input);
-                    alert('Invalid amount format. Please enter a valid number.');
-                    return;
+                if (!self._validateAndNormalizeAmount($input, data, original)) {
+                    return; // Validation failed
                 }
             }
 
@@ -147,7 +150,7 @@ jQuery.widget ("custom.FinTransactions", {
                 function(message, isNetworkError) {
                     // Error callback
                     self._markError($input);
-                    alert(message);
+                    self._showErrorMessage(message);
                 }
             );
         });
@@ -196,6 +199,9 @@ jQuery.widget ("custom.FinTransactions", {
     reload: function() {
         var self = this;
 
+        // Remember current edit mode state
+        var wasInEditMode = self.options.editMode;
+
         self.clear();
 
         var data = self.getFilterFormData();
@@ -207,38 +213,64 @@ jQuery.widget ("custom.FinTransactions", {
             dataType: 'json'
         }).done(function(data) {
             self.setTransactions(data.transactions);
-			self.updateTotal(data.total);
+            self.updateTotal(data.total);
+
+            // Restore edit mode if it was enabled before reload
+            if (wasInEditMode) {
+                self.switchToEditMode();
+            }
         })
             .fail(function() {
                 alert( "error" );
             });
     },
-	
-	applyChanges: function() {		
+    
+    applyChanges: function() {        
         var self = this;
-		
-		var filterData = $.param(self.getFilterFormData());
-		var formData = this.options.form.serialize();		
+
+        // Remember current edit mode state
+        var wasInEditMode = self.options.editMode;
+
+        var filterData = $.param(self.getFilterFormData());
+        var formData = this.options.form.serialize();        
 
         self.clear();
-		
-		$.ajax({
+        
+        $.ajax({
             url: self.options.saveUrl,
             method: 'POST',
             data: filterData + '&' + formData,
             dataType: 'json'
         }).done(function(data) {
             self.setTransactions(data.transactions);
-			self.updateTotal(data.total);
+            self.updateTotal(data.total);
+
+            // Restore edit mode if it was enabled before applyChanges
+            if (wasInEditMode) {
+                self.switchToEditMode();
+            }
         })
             .fail(function() {
                 alert( "error" );
             });
-	},
+    },
 
     setTransactions: function (transactions) {
+        // Clear existing transaction data
+        this._transactionData = {};
+
         for (var i = 0; i < transactions.length; i++) {
             var row = transactions[i];
+
+            // Store transaction data for attribute restoration
+            this._transactionData[row.id] = {
+                id: row.id,
+                accountId: row.accountId,
+                categoryId: row.categoryId,
+                accountName: row.accountName,
+                categoryName: row.categoryName
+            };
+
             this.options.dataTableObj.fnAddData([
                 row.id,
                 row.date,
@@ -336,9 +368,9 @@ jQuery.widget ("custom.FinTransactions", {
         }
     },
 
-	updateTotal: function(total) {
-		$('#transaction_total').html(total);
-	},	
+    updateTotal: function(total) {
+        $('#transaction_total').html(total);
+    },    
 
     clear: function() {
         this.options.dataTableObj.fnClearTable();
@@ -419,7 +451,7 @@ jQuery.widget ("custom.FinTransactions", {
 
         // Set initial values
         $('#split_amount_1').val(currentAmount);
-        $('#split_amount_2').val('0');
+        $('#split_amount_2').val(self.DEFAULT_AMOUNT);
 
         // Store references
         $('#splitTransactionModal').data('original-input', $amountInput);
@@ -434,7 +466,7 @@ jQuery.widget ("custom.FinTransactions", {
         // Focus first input
         setTimeout(function() {
             $('#split_amount_1').focus().select();
-        }, 300);
+        }, self.MODAL_FOCUS_DELAY);
     },
 
     // Create split transaction modal
@@ -545,7 +577,7 @@ jQuery.widget ("custom.FinTransactions", {
             function(message, isNetworkError) {
                 // Error callback
                 self._markError($originalInput);
-                alert(message);
+                self._showErrorMessage(message);
             }
         );
 
@@ -572,12 +604,12 @@ jQuery.widget ("custom.FinTransactions", {
                     self._addNewSplitRow(resp, originalData, amount2, $originalRow);
                     console.log('Split transaction created successfully with ID:', resp.id);
                 } else {
-                    alert('Error creating split transaction - no ID returned');
+                    self._showErrorMessage('Error creating split transaction - no ID returned');
                 }
             },
             function(message, isNetworkError) {
                 // Error callback
-                alert(message);
+                self._showErrorMessage(message);
             }
         );
     },
@@ -585,6 +617,14 @@ jQuery.widget ("custom.FinTransactions", {
     // Helper: Add new split row to table
     _addNewSplitRow: function(resp, originalData, amount2, $originalRow) {
         var self = this;
+
+        // Store transaction data for the new split transaction
+        self._updateStoredTransactionData(resp.id,
+            originalData.accountId,
+            originalData.categoryId,
+            originalData.accountName,
+            originalData.categoryName
+        );
 
         // Create new row data array
         var newRowData = [
@@ -606,6 +646,11 @@ jQuery.widget ("custom.FinTransactions", {
         // Redraw and position the new row
         self.options.dataTable.draw(false);
         self._positionSplitRow(resp.id, originalData.id);
+
+        // Convert new row to edit mode if table is currently in edit mode
+        if (self.options.editMode) {
+            self._convertNewRowToEditMode(resp.id);
+        }
     },
 
     // Helper: Position split row after original row
@@ -617,5 +662,93 @@ jQuery.widget ("custom.FinTransactions", {
         if ($newRow.length && $originalRow.length) {
             $newRow.detach().insertAfter($originalRow);
         }
+    },
+
+    // Helper: Convert specific row to edit mode by row ID
+    _convertNewRowToEditMode: function(rowId) {
+        var self = this;
+        var $targetRow = this.options.table.find('tbody tr[data-row-id="' + rowId + '"]');
+
+        if ($targetRow.length) {
+            self._convertCellToEditMode($targetRow, self.COLUMN_INDICES.DATE, self.CSS_CLASSES.EDIT_DATE, 'date');
+            self._convertCellToEditMode($targetRow, self.COLUMN_INDICES.DESCRIPTION, self.CSS_CLASSES.EDIT_DESCRIPTION, 'text');
+            self._convertCellToEditMode($targetRow, self.COLUMN_INDICES.AMOUNT, self.CSS_CLASSES.EDIT_AMOUNT, 'number');
+        }
+    },
+
+    // Helper: Restore row attributes after DataTable redraw (search/filter)
+    _restoreRowAttributes: function() {
+        var self = this;
+        this.options.table.find('tbody tr').each(function() {
+            var $row = $(this);
+            var cells = $row.find('td');
+
+            // Get transaction ID from checkbox name attribute in first column
+            if (cells.length > 0) {
+                var $checkbox = $(cells[0]).find('input[type="checkbox"]');
+                if ($checkbox.length > 0) {
+                    var transactionId = self._extractTransactionIdFromCheckbox($checkbox);
+                    if (transactionId) {
+                        var transactionData = self._transactionData[transactionId];
+                        if (transactionData) {
+                            self._setRowDataAttributes($row,
+                                transactionData.id,
+                                transactionData.accountId,
+                                transactionData.categoryId
+                            );
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    // Helper: Update stored transaction data (for split transactions)
+    _updateStoredTransactionData: function(id, accountId, categoryId, accountName, categoryName) {
+        this._transactionData[id] = {
+            id: id,
+            accountId: accountId,
+            categoryId: categoryId,
+            accountName: accountName,
+            categoryName: categoryName
+        };
+    },
+
+    // Helper: Validate and normalize amount input
+    _validateAndNormalizeAmount: function($input, data, original) {
+        var numValue = parseFloat(data.amount);
+        if (data.amount !== '' && !isNaN(numValue)) {
+            data.amount = numValue.toFixed(2);
+            $input.val(data.amount);
+            return true;
+        } else if (data.amount !== '') {
+            // Invalid amount - revert to original and show error
+            $input.val(original);
+            this._markError($input);
+            alert('Invalid amount format. Please enter a valid number.');
+            return false;
+        }
+        return true;
+    },
+
+    // Helper: Validate required configuration
+    _validateConfiguration: function() {
+        if (!this.options.updateOneUrl) {
+            console.error('updateOneUrl not configured');
+            return false;
+        }
+        return true;
+    },
+
+    // Helper: Extract transaction ID from checkbox
+    _extractTransactionIdFromCheckbox: function($checkbox) {
+        var checkboxName = $checkbox.attr('name');
+        var matches = checkboxName ? checkboxName.match(/id\[(\d+)\]/) : null;
+        return matches && matches[1] ? matches[1] : null;
+    },
+
+    // Helper: Show error message (centralized error handling)
+    _showErrorMessage: function(message) {
+        alert(message); // Could be replaced with a more sophisticated notification system
     }
 });

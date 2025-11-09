@@ -136,14 +136,9 @@ nav a.navbar-brand > img {
     }
 
     /* Keep inputs full width in edit mode for better UX */
-    @media (min-width: 1400px) {
-        .edit-amount {
-            text-align: right;
-        }
-
-        .edit-description {
-            width: calc(100% - 30px); /* Account for split button */
-        }
+    .edit-amount {
+        text-align: right;
+        width: calc(100% - 30px); /* Account for split button */
     }
 }
 
